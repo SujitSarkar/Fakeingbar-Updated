@@ -5,8 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemeController extends GetxController {
   RxBool isLite = true.obs;
   SharedPreferences? pref;
-  Color? backgroundColor = Colors.grey[100];
-  Color? textColor = Colors.white;
+  Color? backgroundColor = Color(0xfff5f5f5);
+  Color? darkenTextColor = Color(0xff787878);
+  Color scaffoldBackgroundColor = Colors.white;
+  Color textColor = Colors.black;
+  Color chatBGColor = Color(0xfff5f5f5);
 
   @override
   void onInit() {
@@ -29,11 +32,17 @@ class ThemeController extends GetxController {
 
   changeColors() {
     if (isLite.value) {
-      backgroundColor = Colors.grey[100];
-      textColor = Colors.white;
-    } else {
-      backgroundColor = Colors.grey.shade800;
+      backgroundColor = const Color(0xfff5f5f5);
+      darkenTextColor = const Color(0xff787878);
       textColor = Colors.black;
+      scaffoldBackgroundColor = Colors.white;
+      chatBGColor = Color(0xfff5f5f5);
+    } else {
+      backgroundColor = const Color(0xff303030);
+      darkenTextColor = const Color(0xff898989);
+      textColor = Colors.white;
+      scaffoldBackgroundColor = Colors.black;
+      chatBGColor = Color(0xff303030);
     }
   }
 }

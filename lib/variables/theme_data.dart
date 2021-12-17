@@ -4,6 +4,7 @@ class SThemeData {
   static Color greyColor = Colors.grey;
   static Color whiteColor = Colors.white;
   static Color blackColor = Colors.black;
+  static Color textColor = const Color(0xff787878);
 
   static final ThemeData lightThemeData = ThemeData(
     backgroundColor: Colors.white,
@@ -21,6 +22,10 @@ class SThemeData {
       ),
       actionsIconTheme: IconThemeData(color: blackColor),
     ),
+    inputDecorationTheme: const InputDecorationTheme(
+      filled: true,
+      fillColor: Color(0xfff5f5f5),
+    ),
     textTheme: TextTheme(
       headline1: TextStyle(color: blackColor),
       headline2: TextStyle(color: blackColor),
@@ -36,6 +41,7 @@ class SThemeData {
       button: TextStyle(color: blackColor),
       overline: TextStyle(color: blackColor),
     ),
+    iconTheme: IconThemeData(color: blackColor),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.transparent,
       elevation: 0.0,
@@ -58,13 +64,17 @@ class SThemeData {
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: whiteColor),
         titleTextStyle: TextStyle(
           color: whiteColor,
           fontWeight: FontWeight.bold,
           fontSize: 18,
         ),
-        actionsIconTheme: IconThemeData(color: Colors.white),
+        actionsIconTheme: IconThemeData(color: whiteColor),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: Color(0xff303030),
       ),
       textTheme: TextTheme(
         headline1: TextStyle(color: whiteColor),
@@ -81,6 +91,7 @@ class SThemeData {
         button: TextStyle(color: whiteColor),
         overline: TextStyle(color: whiteColor),
       ),
+      iconTheme: IconThemeData(color: whiteColor),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.transparent,
           elevation: 0.0,
