@@ -1,3 +1,4 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/pages/chat.dart';
@@ -6,9 +7,30 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final ThemeController _themeController = Get.find();
+
+  late List<String> menuItems;
+  CustomPopupMenuController _controller = CustomPopupMenuController();
+
+  @override
+  void initState() {
+    menuItems = [
+      "Delete",
+      "Set Seen",
+      "Set Received",
+      "Not Received",
+      "Not Send",
+    ];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,14 +106,14 @@ class HomePage extends StatelessWidget {
             _appbarSection(context),
             _searchSection(),
             _daySection(),
-            CircleProfs(
+            singleChatRow(
               "Ankur",
               "images/m2.jpg",
               "Lets meet tomorrow",
               " . 3:09 PM",
               true,
             ),
-            CircleProfs(
+            singleChatRow(
               "Stella",
               "images/w2.jpg",
               "Hey What's up?",
@@ -344,7 +366,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  CircleProfs(
+  singleChatRow(
       String name, String imgUrl, String msg, String time, bool isOnline) {
     return Padding(
       padding: EdgeInsets.only(
@@ -352,55 +374,103 @@ class HomePage extends StatelessWidget {
         right: customWidth(.05),
         bottom: customWidth(0.05),
       ),
-      child: GestureDetector(
-        onTap: () {
-          Get.to(() => Chat(name, imgUrl, isOnline));
-        },
-        child: Container(
-          decoration: const BoxDecoration(shape: BoxShape.circle),
-          child: Row(
-            children: <Widget>[
-              CustomeCircleAvatar(
-                name: name,
-                imgUrl: imgUrl,
-                isOnline: isOnline,
-              ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: _themeController.darkenTextColor,
-                      fontWeight: FontWeight.w400,
+      child: CustomPopupMenu(
+        pressType: PressType.longPress,
+        verticalMargin: -10,
+        menuBuilder: () => _buildMenus(),
+        child: GestureDetector(
+          onTap: () {
+            Get.to(() => Chat(name, imgUrl, isOnline));
+          },
+          child: Container(
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            child: Row(
+              children: <Widget>[
+                CustomeCircleAvatar(
+                  name: name,
+                  imgUrl: imgUrl,
+                  isOnline: isOnline,
+                ),
+                SizedBox(
+                  width: 10.0,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: _themeController.darkenTextColor,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 4.0,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          msg,
+                          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(
+                          height: 2.0,
+                        ),
+                        Text(
+                          time,
+                          style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                        ),
+                      ],
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ClipRRect _buildMenus() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(5),
+      child: Container(
+        color: const Color(0xFF4C4C4C),
+        child: IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: menuItems
+                .map(
+                  (item) => GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: _controller.hideMenu,
+                    child: Container(
+                      height: 40,
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.only(left: 10),
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                item,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    height: 4.0,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        msg,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(
-                        height: 2.0,
-                      ),
-                      Text(
-                        time,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                      ),
-                    ],
-                  )
-                ],
-              )
-            ],
+                )
+                .toList(),
           ),
         ),
       ),

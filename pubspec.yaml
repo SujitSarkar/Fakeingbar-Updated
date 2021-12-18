@@ -13,6 +13,7 @@ dependencies:
   shared_preferences: ^2.0.11
   get: ^4.6.1
   font_awesome_flutter: ^9.2.0
+  custom_pop_up_menu: ^1.2.2
 
 dev_dependencies:
   flutter_test:
