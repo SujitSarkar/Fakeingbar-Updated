@@ -1,9 +1,12 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
+import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/pages/chat.dart';
+import 'package:fakeingbar/pages/profile_page.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -17,8 +20,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ThemeController _themeController = Get.find();
 
+  final List<User> _users = [];
+
   late List<String> menuItems;
-  CustomPopupMenuController _controller = CustomPopupMenuController();
+
+  LongPressDownDetails? _pressDetails;
 
   @override
   void initState() {
@@ -29,76 +35,13 @@ class _HomePageState extends State<HomePage> {
       "Not Received",
       "Not Send",
     ];
+    _users.addAll(users);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(
-      //     "Chats",
-      //     style: TextStyle(
-      //       fontWeight: FontWeight.bold,
-      //       fontSize: customWidth(.065),
-      //     ),
-      //   ),
-      //   //backgroundColor: Colors.white,
-      //   leading: InkWell(
-      //     onTap: () => Navigator.pushNamed(context, '/profile'),
-      //     child: Padding(
-      //       padding: EdgeInsets.only(
-      //           top: customWidth(.023),
-      //           left: customWidth(.045),
-      //           bottom: customWidth(.023)),
-      //       child: CircleAvatar(
-      //         backgroundImage: AssetImage("images/m1.jpg"),
-      //         radius: 25.0,
-      //       ),
-      //     ),
-      //   ),
-      //   actions: <Widget>[
-      //     Padding(
-      //       padding: const EdgeInsets.all(10.0),
-      //       child: Row(
-      //         children: <Widget>[
-      //           // CircleAvatar(
-      //           //   backgroundColor: _themeController.backgroundColor,
-      //           //   child: const Icon(
-      //           //     Icons.camera_alt,
-      //           //     color: Colors.black,
-      //           //     size: 20,
-      //           //   ),
-      //           // ),
-      //           Container(
-      //             padding: EdgeInsets.all(customWidth(.018)),
-      //             decoration: BoxDecoration(
-      //               color: _themeController.backgroundColor,
-      //               borderRadius: BorderRadius.circular(customWidth(.06)),
-      //             ),
-      //             child: const Icon(
-      //               Icons.camera_alt,
-      //               size: 20,
-      //             ),
-      //           ),
-      //           SizedBox(width: MediaQuery.of(context).size.width * .035),
-      //           Container(
-      //             padding: EdgeInsets.all(customWidth(.018)),
-      //             decoration: BoxDecoration(
-      //               color: _themeController.backgroundColor,
-      //               borderRadius: BorderRadius.circular(customWidth(.06)),
-      //             ),
-      //             child: const Icon(
-      //               Icons.edit,
-      //               size: 20,
-      //             ),
-      //           )
-      //         ],
-      //       ),
-      //     ),
-      //   ],
-      //   elevation: 0.0,
-      // ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -106,19 +49,28 @@ class _HomePageState extends State<HomePage> {
             _appbarSection(context),
             _searchSection(),
             _daySection(),
-            singleChatRow(
-              "Ankur",
-              "images/m2.jpg",
-              "Lets meet tomorrow",
-              " . 3:09 PM",
-              true,
-            ),
-            singleChatRow(
-              "Stella",
-              "images/w2.jpg",
-              "Hey What's up?",
-              " . Wed",
-              true,
+            // singleChatRow(
+            //   "Ankur",
+            //   "images/m2.jpg",
+            //   "Lets meet tomorrow",
+            //   " . 3:09 PM",
+            //   true,
+            //   true,
+            // ),
+            // singleChatRow(
+            //   "Stella",
+            //   "images/w2.jpg",
+            //   "Hey What's up?",
+            //   " . Wed",
+            //   true,
+            //   false,
+            // ),
+            ListView(
+              shrinkWrap: true,
+              children: [
+                ...List.generate(
+                    _users.length, (index) => singleChatRow(users[index]))
+              ],
             ),
             Center(
               child: ElevatedButton(
@@ -135,53 +87,50 @@ class _HomePageState extends State<HomePage> {
 
   BottomNavigationBar _bottomNav(BuildContext context) {
     return BottomNavigationBar(
-        backgroundColor: _themeController.scaffoldBackgroundColor,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(
-              FontAwesomeIcons.solidComment,
-              size: 21,
-            ),
-            label: 'Chats',
+      backgroundColor: _themeController.scaffoldBackgroundColor,
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(
+            FontAwesomeIcons.solidComment,
+            size: 21,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.people,
-              size: 30,
-            ),
-            label: 'People',
+          label: 'Chats',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(
+            Icons.people,
+            size: 30,
           ),
-        ],
-        type: BottomNavigationBarType.fixed,
-        currentIndex: 0,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        iconSize: MediaQuery.of(context).size.width * .07,
-        //onTap: ,
-        elevation: 5
-        // child: Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //   children: <Widget>[
-        //     IconButton(
-        //         icon: Icon(
-        //           Icons.chat,
-        //           size: 25.0,
-        //         ),
-        //         onPressed: () {}
-        //     ),
-        //     SizedBox(
-        //       width: 40.0,
-        //     ),
-        //     IconButton(
-        //         icon: Icon(
-        //           Icons.people,
-        //           //color: Colors.grey,
-        //           size: 30.0,
-        //         ),
-        //         onPressed: () {Navigator.pushNamed(context, '/people');}),
-        //   ],
-        // ),
-        );
+          label: 'People',
+        ),
+      ],
+
+      currentIndex: 0,
+      iconSize: MediaQuery.of(context).size.width * .07,
+      //onTap: ,
+      // child: Row(
+      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //   children: <Widget>[
+      //     IconButton(
+      //         icon: Icon(
+      //           Icons.chat,
+      //           size: 25.0,
+      //         ),
+      //         onPressed: () {}
+      //     ),
+      //     SizedBox(
+      //       width: 40.0,
+      //     ),
+      //     IconButton(
+      //         icon: Icon(
+      //           Icons.people,
+      //           //color: Colors.grey,
+      //           size: 30.0,
+      //         ),
+      //         onPressed: () {Navigator.pushNamed(context, '/people');}),
+      //   ],
+      // ),
+    );
   }
 
   Row _appbarSection(BuildContext context) {
@@ -189,7 +138,7 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         InkWell(
-          onTap: () => Navigator.pushNamed(context, '/profile'),
+          onTap: () => Get.to(() => ProfilePage()),
           child: Padding(
             padding: EdgeInsets.only(
               top: customWidth(.03),
@@ -197,10 +146,33 @@ class _HomePageState extends State<HomePage> {
               bottom: customWidth(.03),
               right: customWidth(.05),
             ),
-            child: CircleAvatar(
-              backgroundImage: AssetImage("images/m1.jpg"),
-              radius: customWidth(.05),
-            ),
+            child: Container(
+                width: customWidth(.16),
+                height: customWidth(.16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: _themeController.scaffoldBackgroundColor,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  // child: _themeController.imageFile != null
+                  //     ? Image.file(
+                  //         _themeController.imageFile!,
+                  //         fit: BoxFit.cover,
+                  //       )
+                  //     : _themeController.pref!.getString("profilePicPath") !=
+                  //             null
+                  //         ? Image.asset(
+                  //             _themeController.pref!
+                  //                 .getString("profilePicPath")!,
+                  //             fit: BoxFit.cover)
+                  //         : Image.asset(
+                  //             'images/m1.jpg',
+                  //             fit: BoxFit.cover,
+                  //           ),
+                  child: Image.asset(_themeController.profilePicPath.value,
+                      fit: BoxFit.cover),
+                )),
           ),
         ),
         Text(
@@ -280,21 +252,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _daySingleWidget(String name, String imgUrl, bool isOnline) {
+  _daySingleWidget(User user) {
     return Container(
       width: customWidth(.2),
+      height: customWidth(.3),
       padding: EdgeInsets.symmetric(horizontal: customWidth(.025)),
       // decoration: BoxDecoration(color: Colors.amber),
       child: Column(
         children: <Widget>[
           CustomeCircleAvatar(
-            name: name,
-            imgUrl: imgUrl,
-            isOnline: isOnline,
+            user: user,
           ),
           Container(
             child: Text(
-              name,
+              user.name,
               softWrap: true,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -315,7 +286,7 @@ class _HomePageState extends State<HomePage> {
       child: ListView(
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        children: <Widget>[
+        children: [
           SizedBox(
             width: customWidth(.025),
           ),
@@ -352,128 +323,140 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          _daySingleWidget("Evan hossain", "images/w1.jpg", true),
-          _daySingleWidget("Stella", "images/w2.jpg", true),
-          _daySingleWidget("Rosy", "images/w1.jpg", true),
-          _daySingleWidget("Ani", "images/w2.jpg", false),
-          _daySingleWidget("Gabriela", "images/w1.jpg", true),
-          _daySingleWidget("Marsh", "images/w2.jpg", false),
-          _daySingleWidget("Rudolf", "images/w1.jpg", true),
-          _daySingleWidget("Shaun", "images/w1.jpg", false),
-          _daySingleWidget("Jason", "images/w1.jpg", true)
+          ...List.generate(
+              users.length, (index) => _daySingleWidget(users[index])),
         ],
       ),
     );
   }
 
-  singleChatRow(
-      String name, String imgUrl, String msg, String time, bool isOnline) {
+  singleChatRow(User user) {
     return Padding(
       padding: EdgeInsets.only(
         left: customWidth(.05),
         right: customWidth(.05),
         bottom: customWidth(0.05),
       ),
-      child: CustomPopupMenu(
-        pressType: PressType.longPress,
-        verticalMargin: -10,
-        menuBuilder: () => _buildMenus(),
-        child: GestureDetector(
-          onTap: () {
-            Get.to(() => Chat(name, imgUrl, isOnline));
-          },
-          child: Container(
-            decoration: const BoxDecoration(shape: BoxShape.circle),
-            child: Row(
-              children: <Widget>[
-                CustomeCircleAvatar(
-                  name: name,
-                  imgUrl: imgUrl,
-                  isOnline: isOnline,
-                ),
-                SizedBox(
-                  width: 10.0,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: _themeController.darkenTextColor,
-                        fontWeight: FontWeight.w400,
+      child: GestureDetector(
+        onTap: () {
+          Get.to(() => Chat(
+                user: user,
+              ));
+        },
+        onLongPressDown: (pressDetails) {
+          setState(() {
+            _pressDetails = pressDetails;
+          });
+        },
+        onLongPress: () {
+          _showPopupMenu(_pressDetails!.globalPosition);
+        },
+        child: Container(
+          decoration: const BoxDecoration(shape: BoxShape.circle),
+          child: Row(
+            children: <Widget>[
+              CustomeCircleAvatar(
+                user: user,
+              ),
+              SizedBox(
+                width: 10.0,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    user.name,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: _themeController.darkenTextColor,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 4.0,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        user.msg,
+                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    SizedBox(
-                      height: 4.0,
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          msg,
-                          style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(
-                          height: 2.0,
-                        ),
-                        Text(
-                          time,
-                          style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                        ),
-                      ],
-                    )
-                  ],
-                )
-              ],
-            ),
+                      SizedBox(
+                        height: 2.0,
+                      ),
+                      Text(
+                        user.lastOnlineTime,
+                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            ],
           ),
         ),
       ),
     );
   }
 
-  ClipRRect _buildMenus() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(5),
-      child: Container(
-        color: const Color(0xFF4C4C4C),
-        child: IntrinsicWidth(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: menuItems
-                .map(
-                  (item) => GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: _controller.hideMenu,
-                    child: Container(
-                      height: 40,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10),
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              child: Text(
-                                item,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
+  _showPopupMenu(Offset offset) async {
+    double left = offset.dx;
+    double top = offset.dy;
+    await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(left, top, 0, 0),
+      items: [
+        // ...List.generate(
+        //     5,
+        //     (index) => PopupMenuItem(
+        //           child: Text(menuItems[index]),
+        //           value: index,
+        //           onTap: () => print(index),
+        //         ))
+        PopupMenuItem(
+          child: Text(menuItems[0]),
+          onTap: () => _menuIndexedFunction(0),
         ),
-      ),
+        PopupMenuItem(
+          child: Text(menuItems[1]),
+          onTap: () => _menuIndexedFunction(1),
+        ),
+        PopupMenuItem(
+          child: Text(menuItems[2]),
+          onTap: () => _menuIndexedFunction(2),
+        ),
+        PopupMenuItem(
+          child: Text(menuItems[3]),
+          onTap: () => _menuIndexedFunction(3),
+        ),
+        PopupMenuItem(
+          child: Text(menuItems[4]),
+          onTap: () => _menuIndexedFunction(4),
+        ),
+      ],
+      elevation: 8.0,
     );
+  }
+
+  _menuIndexedFunction(int item) {
+    switch (item) {
+      case 0:
+        print("$item Delete.............");
+        break;
+      case 1:
+        print("$item Set Seen............");
+        break;
+      case 2:
+        print("$item Set Received..............");
+        break;
+      case 3:
+        print("$item Not Received...............");
+        break;
+      case 4:
+        print("$item Not Send...............");
+        break;
+      default:
+    }
   }
 }

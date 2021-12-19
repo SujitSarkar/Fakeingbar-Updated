@@ -1,27 +1,29 @@
+import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
+import 'package:fakeingbar/models/chat_list.dart';
+import 'package:fakeingbar/models/user.dart';
+import 'package:fakeingbar/pages/audio_call_page.dart';
+import 'package:fakeingbar/pages/video_call.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
-import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
+import 'package:fakeingbar/widgets/chat_bubble.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
-import '../config.dart';
-
-const listYourFriendChat = [
-  'Nice to meet you!',
-  'Hello',
-];
-const listYourChat = [
-  'Nice to meet you!',
-  'Hi',
-];
+// const listYourFriendChat = [
+//   'Nice to meet you!',
+//   'Hello',
+// ];
+// const listYourChat = [
+//   'Nice to meet you!',
+//   'Hi',
+// ];
 
 class Chat extends StatefulWidget {
-  final String name, image;
-  final bool isOnline;
-  const Chat(this.name, this.image, this.isOnline, {Key? key})
-      : super(key: key);
+  final User user;
+  const Chat({Key? key, required this.user}) : super(key: key);
 
   @override
   _ChatState createState() => _ChatState();
@@ -31,6 +33,24 @@ class _ChatState extends State<Chat> {
   final _isScroll = true;
 
   final ThemeController _themeController = Get.find();
+  final ChatListController _chatListController = Get.find();
+
+  List<ChatList> _chatList = [];
+  List<String> chatSetting = [];
+
+  TapDownDetails? _pressDetails;
+
+  @override
+  void initState() {
+    _chatList = _chatListController.chatlist;
+    chatSetting = [
+      "Block",
+      "Set Profile Picture",
+      "Add Date/Time",
+      "Chat Settings",
+    ];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,109 +59,28 @@ class _ChatState extends State<Chat> {
         child: Column(
           children: <Widget>[
             _buildAppBar(),
-            Expanded(
-              child: ListView.builder(
-                reverse: true,
-                itemBuilder: (BuildContext context, int index) {
-                  // if (index != ListYourFriendChat.length - 1) {
-                  return Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 2.0,
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(
-                              height: customWidth(.08),
-                              width: customWidth(.08),
-                              child: CustomeCircleAvatar(
-                                name: widget.name,
-                                imgUrl: widget.image,
-                                isOnline: widget.isOnline,
-                                dotSize: customWidth(.032),
-                                borderWidth: 2,
-                              ),
-                            ),
-                            const SizedBox(width: 15.0),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(
-                                vertical: customWidth(.025),
-                                horizontal: customWidth(.04),
-                              ),
-                              decoration: BoxDecoration(
-                                color: _themeController.chatBGColor,
-                                borderRadius:
-                                    BorderRadius.circular(customWidth(.1)),
-                              ),
-                              child: Text(
-                                listYourFriendChat[index],
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  color: _themeController.textColor,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 2.0,
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(
-                                vertical: customWidth(.025),
-                                horizontal: customWidth(.04),
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.deepPurpleAccent,
-                                borderRadius:
-                                    BorderRadius.circular(customWidth(.1)),
-                              ),
-                              child: Text(
-                                listYourChat[index],
-                                style: const TextStyle(
-                                    fontSize: 16.0, color: Colors.white),
-                              ),
-                            ),
-                            const SizedBox(width: 15.0),
-                            // SizedBox(
-                            //   height: customWidth(.08),
-                            //   width: customWidth(.08),
-                            //   child: CustomeCircleAvatar(
-                            //     name: widget.name,
-                            //     imgUrl: widget.image,
-                            //     isOnline: widget.isOnline,
-                            //     dotSize: customWidth(.032),
-                            //     borderWidth: 2,
-                            //   ),
-                            // )
-                          ],
-                        ),
-                      )
-                    ],
-                  );
-                  //} else {
-                  //return
-                },
-                itemCount: listYourFriendChat.length,
-              ),
-            ),
+            _buildChat(),
             _buildBottomChat(),
           ],
         ),
+      ),
+    );
+  }
+
+  Expanded _buildChat() {
+    return Expanded(
+      child: ListView.builder(
+        reverse: true,
+        itemBuilder: (BuildContext context, int index) {
+          // if (index != ListYourFriendChat.length - 1) {
+          return ChatBubble(
+            chatList: _chatList[index],
+            user: widget.user,
+          );
+          //} else {
+          //return
+        },
+        itemCount: _chatList.length,
       ),
     );
   }
@@ -150,60 +89,13 @@ class _ChatState extends State<Chat> {
     return ChatAppBarAction(
       isScroll: _isScroll,
       isBack: true,
-      isOnline: widget.isOnline,
-      title: widget.name, //widget.friendItem!.name,
-      imageUrl: widget.image, //widget.friendItem!.imageAvatarUrl,
-      subTitle: widget.isOnline == true ? 'Active now' : '10 hours ago',
-      actions: <Widget>[
-        InkWell(
-          onTap: () {
-            // Navigator.push(context, MaterialPageRoute(builder: (_) {
-            //   return AudioCall(image:widget.image,name:widget.name,);  }));
-          },
-          child: const Icon(
-            FontAwesomeIcons.phoneAlt,
-            color: Colors.deepPurpleAccent,
-            size: 20.0,
-          ),
-        ),
-        SizedBox(width: MediaQuery.of(context).size.width * .05),
-        Row(
-          children: [
-            InkWell(
-              // onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (_)=>VideoCallPage(image:widget.image,name:widget.name))),
-              child: const Icon(
-                FontAwesomeIcons.video,
-                color: Colors.deepPurpleAccent,
-                size: 20.0,
-              ),
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * .008,
-            ),
-            widget.isOnline == true
-                ? Container(
-                    width: 13.0,
-                    height: 13.0,
-                    decoration: BoxDecoration(
-                        color: const Color(0xff4DC82C),
-                        border: Border.all(
-                          width: 3.0,
-                          color: _themeController.scaffoldBackgroundColor,
-                        ),
-                        borderRadius: BorderRadius.circular(15.0)),
-                  )
-                : const SizedBox(
-                    width: 13.0,
-                    height: 13.0,
-                  )
-          ],
-        ),
-        const Icon(
-          Icons.info_rounded,
-          color: Colors.deepPurpleAccent,
-          size: 25.0,
-        ),
-      ],
+      isOnline: widget.user.isOnline,
+      title: widget.user.name, //widget.friendItem!.name,
+      imageUrl: widget.user.imageUrl, //widget.friendItem!.imageAvatarUrl,
+      subTitle: widget.user.isOnline == true
+          ? 'Active now'
+          : "Active ${widget.user.lastOnlineTime}",
+      user: widget.user,
     );
   }
 

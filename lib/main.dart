@@ -1,3 +1,4 @@
+import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/pages/home_page.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeController themeController = Get.put(ThemeController());
+    ChatListController chatController = Get.put(ChatListController());
     return GetBuilder<ThemeController>(builder: (controller) {
       return GetMaterialApp(
         title: 'FakingBar',

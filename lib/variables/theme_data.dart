@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SThemeData {
   static Color greyColor = Colors.grey;
@@ -53,52 +54,54 @@ class SThemeData {
   );
 
   static final ThemeData darkThemeData = ThemeData(
-      backgroundColor: darkThemeColor,
-      brightness: Brightness.dark,
-      primarySwatch: const MaterialColor(0xff000100, darkThemeMapColor),
-      canvasColor: Colors.transparent,
-      indicatorColor: Colors.grey,
-      scaffoldBackgroundColor: Colors.black,
-      textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: Colors.white,
-      ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: whiteColor),
-        titleTextStyle: TextStyle(
-          color: whiteColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-        ),
-        actionsIconTheme: IconThemeData(color: whiteColor),
-      ),
-      inputDecorationTheme: const InputDecorationTheme(
-        filled: true,
-        fillColor: Color(0xff303030),
-      ),
-      textTheme: TextTheme(
-        headline1: TextStyle(color: whiteColor),
-        headline2: TextStyle(color: whiteColor),
-        headline3: TextStyle(color: whiteColor),
-        headline4: TextStyle(color: whiteColor),
-        headline5: TextStyle(color: whiteColor),
-        headline6: TextStyle(color: whiteColor),
-        subtitle1: TextStyle(color: whiteColor),
-        subtitle2: TextStyle(color: whiteColor),
-        bodyText1: TextStyle(color: whiteColor),
-        bodyText2: TextStyle(color: whiteColor),
-        caption: TextStyle(color: whiteColor),
-        button: TextStyle(color: whiteColor),
-        overline: TextStyle(color: whiteColor),
-      ),
+    backgroundColor: darkThemeColor,
+    brightness: Brightness.dark,
+    primarySwatch: const MaterialColor(0xff000100, darkThemeMapColor),
+    canvasColor: Colors.transparent,
+    indicatorColor: Colors.grey,
+    scaffoldBackgroundColor: Colors.black,
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: Colors.white,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.black,
       iconTheme: IconThemeData(color: whiteColor),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          unselectedItemColor: Colors.grey,
-          selectedItemColor: Colors.white));
+      titleTextStyle: TextStyle(
+        color: whiteColor,
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+      ),
+      actionsIconTheme: IconThemeData(color: whiteColor),
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+      filled: true,
+      fillColor: Color(0xff303030),
+    ),
+    textTheme: TextTheme(
+      headline1: TextStyle(color: whiteColor),
+      headline2: TextStyle(color: whiteColor),
+      headline3: TextStyle(color: whiteColor),
+      headline4: TextStyle(color: whiteColor),
+      headline5: TextStyle(color: whiteColor),
+      headline6: TextStyle(color: whiteColor),
+      subtitle1: TextStyle(color: whiteColor),
+      subtitle2: TextStyle(color: whiteColor),
+      bodyText1: TextStyle(color: whiteColor),
+      bodyText2: TextStyle(color: whiteColor),
+      caption: TextStyle(color: whiteColor),
+      button: TextStyle(color: whiteColor),
+      overline: TextStyle(color: whiteColor),
+    ),
+    iconTheme: IconThemeData(color: whiteColor),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.transparent,
+      elevation: 0.0,
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
+      unselectedItemColor: Colors.grey,
+      selectedItemColor: lightThemeColor,
+    ),
+  );
 
   static const Map<int, Color> lightThemeMapColor = {
     //RGB Color Code (0, 194, 162) Hex: 0xff0095B2
