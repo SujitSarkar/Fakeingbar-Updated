@@ -67,9 +67,11 @@ class _ChatBubbleState extends State<ChatBubble> {
                   height: customWidth(.08),
                   width: customWidth(.08),
                   child: CustomeCircleAvatar(
-                    user: widget.user,
                     dotSize: customWidth(.032),
                     borderWidth: 2,
+                    isOnline: widget.user.isOnline,
+                    hasDay: widget.user.hasDay,
+                    imageUrl: widget.user.imageUrl,
                   ),
                 ),
                 const SizedBox(width: 15.0),
@@ -162,11 +164,18 @@ class _ChatBubbleState extends State<ChatBubble> {
   }
 
   _showPopupMenu(Offset offset) async {
+    RenderBox? overlay =
+        Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
       context: context,
-      position: RelativeRect.fromLTRB(left, top, 0, 0),
+      position: RelativeRect.fromLTRB(
+        left,
+        top,
+        overlay!.size.width - left,
+        overlay.size.height - top,
+      ),
       items: [
         // ...List.generate(
         //     5,

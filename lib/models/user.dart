@@ -1,7 +1,9 @@
 class User {
   final int id;
-  final String name, imageUrl, msg, lastOnlineTime;
+  final String name, msg, lastOnlineTime;
   final bool isOnline, hasDay;
+  String imageUrl;
+  bool isBlock;
 
   User({
     required this.id,
@@ -11,7 +13,11 @@ class User {
     required this.lastOnlineTime,
     required this.isOnline,
     required this.hasDay,
+    required this.isBlock,
   });
+  set setIsBlock(bool block) {
+    isBlock = block;
+  }
 }
 
 List<User> users = [
@@ -23,6 +29,7 @@ List<User> users = [
     lastOnlineTime: " . 3:09 PM",
     isOnline: true,
     hasDay: true,
+    isBlock: true,
   ),
   User(
     id: 2,
@@ -32,6 +39,7 @@ List<User> users = [
     lastOnlineTime: " . 3:09 PM",
     isOnline: false,
     hasDay: true,
+    isBlock: false,
   ),
   User(
     id: 3,
@@ -41,6 +49,7 @@ List<User> users = [
     lastOnlineTime: " . Wed",
     isOnline: true,
     hasDay: false,
+    isBlock: false,
   ),
   User(
     id: 4,
@@ -50,6 +59,7 @@ List<User> users = [
     lastOnlineTime: " . 3:09 PM",
     isOnline: true,
     hasDay: true,
+    isBlock: false,
   ),
   User(
     id: 5,
@@ -59,5 +69,6 @@ List<User> users = [
     lastOnlineTime: " . 3:09 PM",
     isOnline: true,
     hasDay: true,
+    isBlock: false,
   ),
 ];

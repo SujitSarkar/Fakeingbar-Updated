@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
@@ -9,24 +12,30 @@ import '../config.dart';
 class CustomeCircleAvatar extends StatelessWidget {
   CustomeCircleAvatar({
     Key? key,
-    required this.user,
+    required this.imageUrl,
     this.dotSize,
     this.borderWidth,
-    this.isChat,
+    this.isBlock,
+    required this.hasDay,
+    required this.isOnline,
   }) : super(key: key);
-  final User user;
+  final String imageUrl;
+
   final double? dotSize;
   final double? borderWidth;
-  final bool? isChat;
+  final bool? isBlock;
+  final bool hasDay, isOnline;
 
   final ThemeController _themeController = Get.find();
+  final ChatListController _chatListController = Get.find();
 
   @override
   Widget build(BuildContext context) {
+    File? imageFile = _chatListController.imageFile;
     return Stack(
       fit: StackFit.passthrough,
       children: [
-        user.hasDay
+        hasDay
             ? Container(
                 width: customWidth(.16),
                 height: customWidth(.16),
@@ -46,16 +55,19 @@ class CustomeCircleAvatar extends StatelessWidget {
                     ),
                   ),
                   child: CircleAvatar(
-                    backgroundImage: AssetImage(user.imageUrl),
+                    backgroundImage: imageFile == null
+                        ? AssetImage(imageUrl)
+                        : FileImage(_chatListController.imageFile!)
+                            as ImageProvider,
                     radius: customWidth(.05),
                   ),
                 ),
               )
             : CircleAvatar(
-                backgroundImage: AssetImage(user.imageUrl),
+                backgroundImage: AssetImage(imageUrl),
                 radius: customWidth(.08),
               ),
-        user.isOnline == true
+        isOnline == true && isBlock == true
             ? Positioned(
                 right: 0,
                 bottom: 0,

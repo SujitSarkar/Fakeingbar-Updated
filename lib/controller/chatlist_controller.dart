@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fakeingbar/models/chat_list.dart';
 import 'package:get/get.dart';
 
@@ -31,4 +33,7 @@ class ChatListController extends GetxController {
       isReceived: "not received",
     ),
   ];
+
+  var isUserBlocked = false.obs;
+  File? imageFile;
 }

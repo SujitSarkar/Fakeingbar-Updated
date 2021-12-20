@@ -1,13 +1,14 @@
+import 'dart:ffi';
+
+import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/chat_list.dart';
 import 'package:fakeingbar/models/user.dart';
-import 'package:fakeingbar/pages/audio_call_page.dart';
-import 'package:fakeingbar/pages/video_call.dart';
+import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -100,89 +101,111 @@ class _ChatState extends State<Chat> {
   }
 
   _buildBottomChat() {
-    return Container(
-      decoration: BoxDecoration(
-        color: _themeController.scaffoldBackgroundColor,
-      ),
-      padding: const EdgeInsets.only(top: 5.0, bottom: 20.0, left: 10),
-      child: Row(
-        children: <Widget>[
-          Container(
-            height: 20.0,
-            width: 22.0,
-            decoration: const BoxDecoration(
-              //borderRadius: BorderRadius.circular(20.0),
-              image: DecorationImage(
-                image: AssetImage('images/noun_menu.png'),
-                fit: BoxFit.cover,
-              ),
+    return Obx(() => _chatListController.isUserBlocked.isTrue
+        ? Container(
+            decoration: BoxDecoration(
+              color: _themeController.scaffoldBackgroundColor,
             ),
-          ),
-          Expanded(
-            flex: 40,
+            padding: const EdgeInsets.only(top: 5.0, bottom: 20.0, left: 10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const [
-                Icon(
-                  FontAwesomeIcons.camera,
-                  size: 20.0,
-                  color: Colors.deepPurpleAccent,
+              children: <Widget>[
+                Container(
+                  height: 20.0,
+                  width: 22.0,
+                  decoration: const BoxDecoration(
+                    //borderRadius: BorderRadius.circular(20.0),
+                    image: DecorationImage(
+                      image: AssetImage('images/noun_menu.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                Icon(
-                  CupertinoIcons.photo,
-                  size: 20.0,
-                  color: Colors.deepPurpleAccent,
-                ),
-                Icon(
-                  CupertinoIcons.mic_solid,
-                  size: 20.0,
-                  color: Colors.deepPurpleAccent,
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 50,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              height: MediaQuery.of(context).size.width * .11,
-              child: TextField(
-                decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.all(10.0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(
-                        width: 0,
-                        style: BorderStyle.none,
+                Expanded(
+                  flex: 40,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: const [
+                      Icon(
+                        FontAwesomeIcons.camera,
+                        size: 20.0,
+                        color: Colors.deepPurpleAccent,
                       ),
+                      Icon(
+                        CupertinoIcons.photo,
+                        size: 20.0,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      Icon(
+                        CupertinoIcons.mic_solid,
+                        size: 20.0,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 50,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 40,
+                    height: MediaQuery.of(context).size.width * .11,
+                    child: TextField(
+                      decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(10.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: const BorderSide(
+                              width: 0,
+                              style: BorderStyle.none,
+                            ),
+                          ),
+                          hintText: 'Aa',
+                          filled: true,
+                          hintStyle: TextStyle(
+                            color: _themeController.darkenTextColor,
+                          ),
+                          suffixIcon: const Icon(
+                            FontAwesomeIcons.solidSmileBeam,
+                            size: 22.0,
+                            color: Colors.deepPurpleAccent,
+                          )),
                     ),
-                    hintText: 'Aa',
-                    filled: true,
-                    hintStyle: TextStyle(
-                      color: _themeController.darkenTextColor,
-                    ),
-                    suffixIcon: const Icon(
-                      FontAwesomeIcons.solidSmileBeam,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      FontAwesomeIcons.solidThumbsUp,
                       size: 22.0,
                       color: Colors.deepPurpleAccent,
-                    )),
+                    ),
+                  ),
+                )
+              ],
+            ))
+        : Container(
+            height: customWidth(.2),
+            width: double.infinity,
+            color: SThemeData.lightThemeColor,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.only(top: 5.0, bottom: 20.0, left: 10),
+            child: RichText(
+              text: const TextSpan(
+                text: "You can't reply to this conversation.",
+                style: TextStyle(color: Colors.white),
+                children: [
+                  TextSpan(
+                    text: "Learn More",
+                    style: TextStyle(
+                      color: Colors.white,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                FontAwesomeIcons.solidThumbsUp,
-                size: 22.0,
-                color: Colors.deepPurpleAccent,
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+          ));
   }
 }
 

@@ -1,13 +1,19 @@
+import 'dart:io';
+
 import 'package:fakeingbar/config.dart';
+import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/pages/audio_call_page.dart';
+import 'package:fakeingbar/pages/chat_settings_page.dart';
+import 'package:fakeingbar/pages/date_time_page.dart';
 import 'package:fakeingbar/pages/video_call.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatAppBarAction extends StatefulWidget {
   final String title;
@@ -35,6 +41,7 @@ class ChatAppBarAction extends StatefulWidget {
 
 class _ChatAppBarActionState extends State<ChatAppBarAction> {
   final ThemeController _themeController = Get.find();
+  final ChatListController _chatListController = Get.find();
 
   TapDownDetails? _pressDetails;
 
@@ -100,7 +107,10 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                     _showPopupMenu(_pressDetails!.globalPosition);
                   },
                   child: CustomeCircleAvatar(
-                    user: widget.user,
+                    isBlock: _chatListController.isUserBlocked.value,
+                    hasDay: widget.user.hasDay,
+                    imageUrl: widget.user.imageUrl,
+                    isOnline: widget.user.isOnline,
                   ),
                 ),
               ),
@@ -133,10 +143,12 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                       ),
                     ),
                     SizedBox(height: 3),
-                    Text(
-                      widget.subTitle,
-                      style: TextStyle(color: Colors.grey, fontSize: 11.0),
-                    )
+                    Obx(() => Text(
+                          _chatListController.isUserBlocked.isTrue
+                              ? widget.subTitle
+                              : "",
+                          style: TextStyle(color: Colors.grey, fontSize: 11.0),
+                        ))
                   ],
                 ),
               ),
@@ -149,55 +161,68 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  InkWell(
-                    onTap: () {
-                      Get.to(() => AudioCall(
-                            name: widget.user.name,
-                            image: widget.user.imageUrl,
-                          ));
-                    },
-                    child: const Icon(
-                      FontAwesomeIcons.phoneAlt,
-                      color: Colors.deepPurpleAccent,
-                      size: 20.0,
-                    ),
+                  Obx(
+                    () => _chatListController.isUserBlocked.isTrue
+                        ? InkWell(
+                            onTap: () {
+                              Get.to(() => AudioCall(
+                                    name: widget.user.name,
+                                    image: widget.user.imageUrl,
+                                  ));
+                            },
+                            child: const Icon(
+                              FontAwesomeIcons.phoneAlt,
+                              color: Colors.deepPurpleAccent,
+                              size: 20.0,
+                            ),
+                          )
+                        : Container(
+                            width: customWidth(.08),
+                          ),
                   ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Get.to(() => VideoCallPage(
-                                name: widget.user.name,
-                                image: widget.user.imageUrl,
-                              ));
-                        },
-                        child: const Icon(
-                          FontAwesomeIcons.video,
-                          color: Colors.deepPurpleAccent,
-                          size: 20.0,
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * .008,
-                      ),
-                      widget.user.isOnline == true
-                          ? Container(
-                              width: 13.0,
-                              height: 13.0,
-                              decoration: BoxDecoration(
-                                  color: const Color(0xff4DC82C),
-                                  border: Border.all(
-                                    width: 3.0,
-                                    color: _themeController
-                                        .scaffoldBackgroundColor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(15.0)),
-                            )
-                          : const SizedBox(
-                              width: 13.0,
-                              height: 13.0,
-                            )
-                    ],
+                  Obx(
+                    () => _chatListController.isUserBlocked.isTrue
+                        ? Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Get.to(() => VideoCallPage(
+                                        name: widget.user.name,
+                                        image: widget.user.imageUrl,
+                                      ));
+                                },
+                                child: const Icon(
+                                  FontAwesomeIcons.video,
+                                  color: Colors.deepPurpleAccent,
+                                  size: 20.0,
+                                ),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * .008,
+                              ),
+                              widget.user.isOnline == true
+                                  ? Container(
+                                      width: 13.0,
+                                      height: 13.0,
+                                      decoration: BoxDecoration(
+                                          color: const Color(0xff4DC82C),
+                                          border: Border.all(
+                                            width: 3.0,
+                                            color: _themeController
+                                                .scaffoldBackgroundColor,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(15.0)),
+                                    )
+                                  : const SizedBox(
+                                      width: 13.0,
+                                      height: 13.0,
+                                    )
+                            ],
+                          )
+                        : Container(
+                            width: customWidth(.08),
+                          ),
                   ),
                   GestureDetector(
                     onTapDown: (pressDetails) {
@@ -222,11 +247,19 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
   }
 
   _showPopupMenu(Offset offset) async {
+    RenderBox? overlay =
+        Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
+
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
       context: context,
-      position: RelativeRect.fromLTRB(left, top, 0, 0),
+      position: RelativeRect.fromLTRB(
+        left,
+        top,
+        overlay!.size.width - left,
+        overlay.size.height - top,
+      ),
       items: [
         // ...List.generate(
         //     5,
@@ -259,18 +292,44 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
   _menuIndexedFunction(int item) {
     switch (item) {
       case 0:
+        _chatListController.isUserBlocked.toggle();
         print("$item Block.............");
         break;
       case 1:
+        _takeProfilePic();
         print("$item Set Profile Picture............");
         break;
       case 2:
+        _getToDateTimePage();
         print("$item Add Date/Time..............");
         break;
       case 3:
+        _getToChatSettingsPage();
         print("$item Chat Settings...............");
         break;
       default:
     }
+  }
+
+  _getToDateTimePage() {
+    Get.to(() => DateTimePage());
+  }
+
+  _getToChatSettingsPage() {
+    Get.to(() => ChatSettingsPage(
+          user: widget.user,
+        ));
+  }
+
+  _takeProfilePic() async {
+    ImagePicker _picker = ImagePicker();
+    await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
+      if (xFile != null) {
+        setState(() {
+          _chatListController.imageFile = File(xFile.path);
+        });
+        _themeController.pref!.setString("profilePicPath", xFile.path);
+      }
+    });
   }
 }

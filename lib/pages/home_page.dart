@@ -261,7 +261,9 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: <Widget>[
           CustomeCircleAvatar(
-            user: user,
+            hasDay: user.hasDay,
+            imageUrl: user.imageUrl,
+            isOnline: user.isOnline,
           ),
           Container(
             child: Text(
@@ -356,7 +358,9 @@ class _HomePageState extends State<HomePage> {
           child: Row(
             children: <Widget>[
               CustomeCircleAvatar(
-                user: user,
+                hasDay: user.hasDay,
+                imageUrl: user.imageUrl,
+                isOnline: user.isOnline,
               ),
               SizedBox(
                 width: 10.0,
