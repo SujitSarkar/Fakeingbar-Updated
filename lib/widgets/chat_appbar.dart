@@ -40,6 +40,7 @@ class ChatAppBarAction extends StatefulWidget {
 }
 
 class _ChatAppBarActionState extends State<ChatAppBarAction> {
+  GlobalKey<PopupMenuButtonState> _key = GlobalKey();
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
 
@@ -97,60 +98,40 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
               SizedBox(
                 height: customWidth(.11),
                 width: customWidth(.11),
-                child: GestureDetector(
-                  onTapDown: (pressDetails) {
-                    setState(() {
-                      _pressDetails = pressDetails;
-                    });
-                  },
-                  onTap: () {
-                    _showPopupMenu(_pressDetails!.globalPosition);
-                  },
-                  child: CustomeCircleAvatar(
-                    isBlock: _chatListController.isUserBlocked.value,
-                    hasDay: widget.user.hasDay,
-                    imageUrl: widget.user.imageUrl,
-                    isOnline: widget.user.isOnline,
-                  ),
+                child: CustomeCircleAvatar(
+                  isBlock: _chatListController.isUserBlocked.value,
+                  hasDay: widget.user.hasDay,
+                  imageUrl: widget.user.imageUrl,
+                  isOnline: widget.user.isOnline,
                 ),
               ),
               SizedBox(
                 width: 10.0,
               ),
-              GestureDetector(
-                onTapDown: (pressDetails) {
-                  setState(() {
-                    _pressDetails = pressDetails;
-                  });
-                },
-                onTap: () {
-                  _showPopupMenu(_pressDetails!.globalPosition);
-                },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      width: 100.0,
-                      child: Text(
-                        widget.user.name,
-                        style: TextStyle(
-                          color: _themeController.textColor,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    width: 100.0,
+                    child: Text(
+                      widget.user.name,
+                      style: TextStyle(
+                        color: _themeController.textColor,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 3),
-                    Obx(() => Text(
-                          _chatListController.isUserBlocked.isTrue
-                              ? widget.subTitle
-                              : "",
-                          style: TextStyle(color: Colors.grey, fontSize: 11.0),
-                        ))
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 3),
+                  Obx(() => Text(
+                        _chatListController.isUserBlocked.isTrue
+                            ? widget.subTitle
+                            : "",
+                        style: TextStyle(color: Colors.grey, fontSize: 11.0),
+                      ))
+                ],
               ),
               SizedBox(
                 width: 10.0,
@@ -224,14 +205,21 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                             width: customWidth(.08),
                           ),
                   ),
-                  GestureDetector(
-                    onTapDown: (pressDetails) {
-                      setState(() {
-                        _pressDetails = pressDetails;
-                      });
+                  PopupMenuButton<int>(
+                    key: _key,
+                    itemBuilder: (context) {
+                      return [
+                        ...List.generate(
+                          chatSetting.length,
+                          (index) => PopupMenuItem(
+                            value: index,
+                            child: Text(chatSetting[index]),
+                          ),
+                        )
+                      ];
                     },
-                    onTap: () {
-                      _showPopupMenu(_pressDetails!.globalPosition);
+                    onSelected: (value) {
+                      _menuIndexedFunction(value);
                     },
                     child: const Icon(
                       Icons.info_rounded,
@@ -246,48 +234,48 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
     );
   }
 
-  _showPopupMenu(Offset offset) async {
-    RenderBox? overlay =
-        Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
+  // _showPopupMenu(Offset offset) async {
+  //   RenderBox? overlay =
+  //       Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
 
-    double left = offset.dx;
-    double top = offset.dy;
-    await showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        left,
-        top,
-        overlay!.size.width - left,
-        overlay.size.height - top,
-      ),
-      items: [
-        // ...List.generate(
-        //     5,
-        //     (index) => PopupMenuItem(
-        //           child: Text(menuItems[index]),
-        //           value: index,
-        //           onTap: () => print(index),
-        //         ))
-        PopupMenuItem(
-          child: Text(chatSetting[0]),
-          onTap: () => _menuIndexedFunction(0),
-        ),
-        PopupMenuItem(
-          child: Text(chatSetting[1]),
-          onTap: () => _menuIndexedFunction(1),
-        ),
-        PopupMenuItem(
-          child: Text(chatSetting[2]),
-          onTap: () => _menuIndexedFunction(2),
-        ),
-        PopupMenuItem(
-          child: Text(chatSetting[3]),
-          onTap: () => _menuIndexedFunction(3),
-        ),
-      ],
-      elevation: 8.0,
-    );
-  }
+  //   double left = offset.dx;
+  //   double top = offset.dy;
+  //   await showMenu(
+  //     context: context,
+  //     position: RelativeRect.fromLTRB(
+  //       left,
+  //       top,
+  //       overlay!.size.width - left,
+  //       overlay.size.height - top,
+  //     ),
+  //     items: [
+  //       // ...List.generate(
+  //       //     5,
+  //       //     (index) => PopupMenuItem(
+  //       //           child: Text(menuItems[index]),
+  //       //           value: index,
+  //       //           onTap: () => print(index),
+  //       //         ))
+  //       PopupMenuItem(
+  //         child: Text(chatSetting[0]),
+  //         onTap: () => _menuIndexedFunction(0),
+  //       ),
+  //       PopupMenuItem(
+  //         child: Text(chatSetting[1]),
+  //         onTap: () => _menuIndexedFunction(1),
+  //       ),
+  //       PopupMenuItem(
+  //         child: Text(chatSetting[2]),
+  //         onTap: () => _menuIndexedFunction(2),
+  //       ),
+  //       PopupMenuItem(
+  //         child: Text(chatSetting[3]),
+  //         onTap: () => _menuIndexedFunction(3),
+  //       ),
+  //     ],
+  //     elevation: 8.0,
+  //   );
+  // }
 
   _menuIndexedFunction(int item) {
     switch (item) {
@@ -312,7 +300,7 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
   }
 
   _getToDateTimePage() {
-    Get.to(() => DateTimePage());
+    Navigator.push(context, MaterialPageRoute(builder: (_) => DateTimePage()));
   }
 
   _getToChatSettingsPage() {

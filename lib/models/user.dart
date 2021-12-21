@@ -1,9 +1,9 @@
 class User {
   final int id;
   final String name, msg, lastOnlineTime;
-  final bool isOnline, hasDay;
+  final bool isOnline;
   String imageUrl;
-  bool isBlock;
+  bool isBlock, hasDay;
 
   User({
     required this.id,
@@ -17,6 +17,10 @@ class User {
   });
   set setIsBlock(bool block) {
     isBlock = block;
+  }
+
+  set setDay(bool day) {
+    hasDay = day;
   }
 }
 

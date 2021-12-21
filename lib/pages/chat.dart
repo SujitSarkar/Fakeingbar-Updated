@@ -8,6 +8,7 @@ import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
+import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -74,9 +75,25 @@ class _ChatState extends State<Chat> {
         reverse: true,
         itemBuilder: (BuildContext context, int index) {
           // if (index != ListYourFriendChat.length - 1) {
-          return ChatBubble(
-            chatList: _chatList[index],
-            user: widget.user,
+          return ListView(
+            shrinkWrap: true,
+            children: [
+              Column(
+                children: [
+                  CustomeCircleAvatar(
+                    hasDay: widget.user.hasDay,
+                    imageUrl: widget.user.imageUrl,
+                    isOnline: widget.user.isOnline,
+                  ),
+                  Text(widget.user.name),
+                  
+                ],
+              ),
+              ChatBubble(
+                chatList: _chatList[index],
+                user: widget.user,
+              ),
+            ],
           );
           //} else {
           //return

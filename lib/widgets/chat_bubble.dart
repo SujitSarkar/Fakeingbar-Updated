@@ -1,6 +1,7 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/chat_list.dart';
 import 'package:fakeingbar/models/user.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +24,7 @@ class ChatBubble extends StatefulWidget {
 }
 
 class _ChatBubbleState extends State<ChatBubble> {
+  final GlobalKey<PopupMenuButtonState> _key = GlobalKey();
   final ThemeController _themeController = Get.find();
 
   List<String> menuItems = [];
@@ -53,55 +55,70 @@ class _ChatBubbleState extends State<ChatBubble> {
             vertical: 2.0,
           ),
           child: GestureDetector(
-            onLongPress: () => _showPopupMenu(_pressDetails!.globalPosition),
-            onLongPressDown: (details) {
-              setState(() {
-                _pressDetails = details;
-              });
-            },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(
-                  height: customWidth(.08),
-                  width: customWidth(.08),
-                  child: CustomeCircleAvatar(
-                    dotSize: customWidth(.032),
-                    borderWidth: 2,
-                    isOnline: widget.user.isOnline,
-                    hasDay: widget.user.hasDay,
-                    imageUrl: widget.user.imageUrl,
-                  ),
-                ),
-                const SizedBox(width: 15.0),
-                Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(
-                    vertical: customWidth(.025),
-                    horizontal: customWidth(.04),
-                  ),
-                  decoration: BoxDecoration(
-                    color: _themeController.chatBGColor,
-                    borderRadius: BorderRadius.circular(customWidth(.05)),
-                  ),
-                  child: Container(
-                    constraints: BoxConstraints(maxWidth: customWidth(.5)),
-                    child: Text(
-                      widget.chatList.receiveMessage,
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                      textWidthBasis: TextWidthBasis.longestLine,
-                      style: TextStyle(
-                        fontSize: 15.0,
-                        color: _themeController.textColor,
-                        fontWeight: FontWeight.w400,
-                        height: 1.3,
-                      ),
+            // onLongPress: () => _showPopupMenu(_pressDetails!.globalPosition),
+            // onLongPressDown: (details) {
+            //   setState(() {
+            //     _pressDetails = details;
+            //   });
+            // },
+            child: PopupMenuButton<int>(
+              key: _key,
+              itemBuilder: (context) {
+                return [
+                  ...List.generate(
+                    menuItems.length,
+                    (index) => PopupMenuItem(
+                      value: index,
+                      child: Text(menuItems[index]),
+                    ),
+                  )
+                ];
+              },
+              onSelected: (value) => _menuIndexedFunction(value),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                    height: customWidth(.08),
+                    width: customWidth(.08),
+                    child: CustomeCircleAvatar(
+                      dotSize: customWidth(.032),
+                      borderWidth: 2,
+                      isOnline: widget.user.isOnline,
+                      hasDay: widget.user.hasDay,
+                      imageUrl: widget.user.imageUrl,
                     ),
                   ),
-                )
-              ],
+                  const SizedBox(width: 15.0),
+                  Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(
+                      vertical: customWidth(.025),
+                      horizontal: customWidth(.04),
+                    ),
+                    decoration: BoxDecoration(
+                      color: _themeController.chatBGColor,
+                      borderRadius: BorderRadius.circular(customWidth(.05)),
+                    ),
+                    child: Container(
+                      constraints: BoxConstraints(maxWidth: customWidth(.5)),
+                      child: Text(
+                        widget.chatList.receiveMessage,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        textWidthBasis: TextWidthBasis.longestLine,
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          color: _themeController.textColor,
+                          fontWeight: FontWeight.w400,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -132,14 +149,17 @@ class _ChatBubbleState extends State<ChatBubble> {
                     color: Colors.deepPurpleAccent,
                     borderRadius: BorderRadius.circular(customWidth(.1)),
                   ),
-                  child: Text(
-                    widget.chatList.sendMessage,
-                    textWidthBasis: TextWidthBasis.longestLine,
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      color: _themeController.textColor,
-                      fontWeight: FontWeight.w400,
-                      height: 1.3,
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: customWidth(.5)),
+                    child: Text(
+                      widget.chatList.sendMessage,
+                      textWidthBasis: TextWidthBasis.longestLine,
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: _themeController.textColor,
+                        fontWeight: FontWeight.w400,
+                        height: 1.3,
+                      ),
                     ),
                   ),
                 ),
@@ -220,6 +240,7 @@ class _ChatBubbleState extends State<ChatBubble> {
   _menuIndexedFunction(int item) {
     switch (item) {
       case 0:
+        _showEditDilog();
         print("$item Edit.............");
         break;
       case 1:
@@ -242,5 +263,29 @@ class _ChatBubbleState extends State<ChatBubble> {
         break;
       default:
     }
+  }
+
+  _showEditDilog() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: IntrinsicHeight(
+          child: Container(
+            padding: EdgeInsets.all(15),
+            child: Column(
+              children: [
+                TextField(),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Save"),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

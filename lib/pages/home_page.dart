@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:fakeingbar/config.dart';
+import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/pages/chat.dart';
 import 'package:fakeingbar/pages/profile_page.dart';
+import 'package:fakeingbar/pages/userday_toggol_page.dart';
+import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +23,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<PopupMenuButtonState> _key = GlobalKey();
   final ThemeController _themeController = Get.find();
+  final ChatListController _chatListController = Get.find();
+  TextEditingController _newChatName = TextEditingController();
 
   final List<User> _users = [];
 
   late List<String> menuItems;
 
   LongPressDownDetails? _pressDetails;
+  TapDownDetails? _tabDownDetails;
+
+  File? createChatImage;
 
   @override
   void initState() {
@@ -42,6 +53,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -85,51 +97,484 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  BottomNavigationBar _bottomNav(BuildContext context) {
-    return BottomNavigationBar(
-      backgroundColor: _themeController.scaffoldBackgroundColor,
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(
-            FontAwesomeIcons.solidComment,
-            size: 21,
+  SizedBox _bottomNav(BuildContext context) {
+    // return BottomNavigationBar(
+    // backgroundColor: _themeController.scaffoldBackgroundColor,
+    // items: const <BottomNavigationBarItem>[
+    //   BottomNavigationBarItem(
+    //     icon: Icon(
+    //       FontAwesomeIcons.solidComment,
+    //       size: 21,
+    //     ),
+    //     label: 'Chats',
+    //   ),
+    //   BottomNavigationBarItem(
+    //     icon: Icon(
+    //       Icons.people,
+    //       size: 30,
+    //     ),
+    //     label: 'People',
+    //   ),
+    // ],
+
+    // currentIndex: 0,
+    // iconSize: MediaQuery.of(context).size.width * .07,
+    // //onTap: ,
+    return SizedBox(
+      height: customWidth(.15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Column(
+            children: [
+              Icon(
+                FontAwesomeIcons.solidComment,
+                size: 25.0,
+              ),
+              Text(
+                'Chat',
+                style: TextStyle(color: _themeController.textColor),
+              )
+            ],
           ),
-          label: 'Chats',
+          SizedBox(
+            width: 40.0,
+          ),
+          PopupMenuButton(
+            key: _key,
+            onSelected: (value) {
+              value == 1
+                  ? showDialog(
+                      context: context,
+                      builder: (context) => _createChat(),
+                    )
+                  : value == 2
+                      ? showDialog(
+                          context: context,
+                          builder: (context) => _createGroupChat(),
+                        )
+                      : null;
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                padding: EdgeInsets.only(left: customWidth(.09)),
+                value: 1,
+                child: IntrinsicWidth(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Create Chat",
+                        style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                              color: _themeController.textColor,
+                            ),
+                      ),
+                      Icon(Icons.person_add),
+                    ],
+                  ),
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                padding: EdgeInsets.only(left: customWidth(.09)),
+                child: IntrinsicWidth(
+                  child: Row(
+                    children: [
+                      Text(
+                        "Create Group",
+                        style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                              color: _themeController.textColor,
+                            ),
+                      ),
+                      Icon(Icons.person_add),
+                    ],
+                  ),
+                ),
+              ),
+              PopupMenuItem(
+                value: 3,
+                padding: EdgeInsets.only(left: customWidth(.09)),
+                child: IntrinsicWidth(
+                  child: Row(
+                    children: [
+                      Text(
+                        "Add Contact",
+                        style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                              color: _themeController.textColor,
+                            ),
+                      ),
+                      Icon(Icons.perm_contact_cal),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            child: Column(
+              children: [
+                Icon(
+                  Icons.people,
+                  color: Colors.grey,
+                  size: 30.0,
+                ),
+                Text(
+                  "People",
+                  style: TextStyle(
+                    color: _themeController.textColor,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Dialog _createChat() => Dialog(
+        child: IntrinsicHeight(
+          // height: customWidth(1),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                color: _themeController.backgroundColor,
+                padding: EdgeInsets.symmetric(
+                    horizontal: customWidth(.04), vertical: customWidth(.02)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Create New Chat",
+                      style: TextStyle(
+                        color: _themeController.textColor,
+                        fontWeight: FontWeight.w400,
+                        fontSize: customWidth(.05),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(Icons.close),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.05),
+              ),
+              GestureDetector(
+                onTap: () async =>
+                    createChatImage = await _chatListController.pickImage(),
+                child: Container(
+                  width: customWidth(.2),
+                  height: customWidth(.2),
+                  padding: EdgeInsets.all(customWidth(.02)),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: SThemeData.lightThemeColor,
+                      width: 2,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      createChatImage == null
+                          ? Image.asset(
+                              "images/person.png",
+                              fit: BoxFit.contain,
+                            )
+                          : Image.file(createChatImage!),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _themeController.backgroundColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: _themeController.darkenTextColor,
+                            size: customWidth(.05),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.05),
+              ),
+              TextField(
+                controller: _newChatName,
+                decoration: InputDecoration(
+                  hintText: "Enter Chat Name",
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: _themeController.textColor,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.05),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: customWidth(.04),
+                ),
+                child: Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: SThemeData.lightThemeColor,
+                    ),
+                    onPressed: () {
+                      if (_newChatName.text != "") {
+                        _chatListController.addNewChat(
+                          name: _newChatName.text,
+                          imageUrl: "images/person.png",
+                          msg: "hi",
+                          lastOnlineTime: "lastOnlineTime",
+                          isOnline: true,
+                          hasDay: true,
+                          isBlock: false,
+                        );
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(
+                      "Save",
+                      style: TextStyle(
+                        color: _themeController.textColor,
+                        fontWeight: FontWeight.w400,
+                        fontSize: customWidth(.05),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.02),
+              ),
+            ],
+          ),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(
-            Icons.people,
-            size: 30,
+      );
+
+  Dialog _createGroupChat() => Dialog(
+        child: IntrinsicHeight(
+          // height: customWidth(1),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                color: _themeController.backgroundColor,
+                padding: EdgeInsets.symmetric(
+                    horizontal: customWidth(.04), vertical: customWidth(.02)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Create New Group Chat",
+                      style: TextStyle(
+                        color: _themeController.textColor,
+                        fontWeight: FontWeight.w400,
+                        fontSize: customWidth(.05),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(Icons.close),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.05),
+              ),
+              GestureDetector(
+                onTap: () async =>
+                    createChatImage = await _chatListController.pickImage(),
+                child: Container(
+                  width: customWidth(.2),
+                  height: customWidth(.2),
+                  padding: EdgeInsets.all(customWidth(.02)),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: SThemeData.lightThemeColor,
+                      width: 2,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      createChatImage == null
+                          ? Image.asset(
+                              "images/person.png",
+                              fit: BoxFit.contain,
+                            )
+                          : Image.file(createChatImage!),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _themeController.backgroundColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: _themeController.darkenTextColor,
+                            size: customWidth(.05),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.05),
+              ),
+              TextField(
+                controller: _newChatName,
+                decoration: InputDecoration(
+                  hintText: "Enter Chat Name",
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: _themeController.textColor,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.05),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: customWidth(.04),
+                ),
+                child: Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: SThemeData.lightThemeColor,
+                    ),
+                    onPressed: () {
+                      if (_newChatName.text != "") {
+                        _chatListController.addNewChat(
+                          name: _newChatName.text,
+                          imageUrl: "images/person.png",
+                          msg: "hi",
+                          lastOnlineTime: "lastOnlineTime",
+                          isOnline: true,
+                          hasDay: true,
+                          isBlock: false,
+                        );
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(
+                      "Save",
+                      style: TextStyle(
+                        color: _themeController.textColor,
+                        fontWeight: FontWeight.w400,
+                        fontSize: customWidth(.05),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: customWidth(.02),
+              ),
+            ],
           ),
-          label: 'People',
+        ),
+      );
+
+  _showPeopleMenu(Offset offset) async {
+    RenderBox? overlay =
+        Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
+    double left = offset.dx;
+    double top = offset.dy;
+    await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        left,
+        top,
+        overlay!.size.width - left,
+        overlay.size.height - top,
+      ),
+      items: [
+        PopupMenuItem(
+          padding: EdgeInsets.only(left: customWidth(.12)),
+          child: IntrinsicWidth(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Create Chat",
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                        color: _themeController.textColor,
+                      ),
+                ),
+                Icon(Icons.person_add),
+              ],
+            ),
+          ),
+          onTap: () {
+            Get.back();
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(),
+            );
+            print('Create Chat');
+          },
+        ),
+        PopupMenuItem(
+          padding: EdgeInsets.only(left: customWidth(.12)),
+          child: IntrinsicWidth(
+            child: Row(
+              children: [
+                Text(
+                  "Create Group",
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                        color: _themeController.textColor,
+                      ),
+                ),
+                Icon(Icons.person_add),
+              ],
+            ),
+          ),
+          onTap: () {
+            print('Create Group');
+          },
+        ),
+        PopupMenuItem(
+          padding: EdgeInsets.only(left: customWidth(.12)),
+          child: IntrinsicWidth(
+            child: Row(
+              children: [
+                Text(
+                  "Add Contact",
+                  style: Theme.of(context).textTheme.headline6!.copyWith(
+                        color: _themeController.textColor,
+                      ),
+                ),
+                Icon(Icons.perm_contact_cal),
+              ],
+            ),
+          ),
+          onTap: () {
+            print('Add Contact');
+          },
         ),
       ],
-
-      currentIndex: 0,
-      iconSize: MediaQuery.of(context).size.width * .07,
-      //onTap: ,
-      // child: Row(
-      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //   children: <Widget>[
-      //     IconButton(
-      //         icon: Icon(
-      //           Icons.chat,
-      //           size: 25.0,
-      //         ),
-      //         onPressed: () {}
-      //     ),
-      //     SizedBox(
-      //       width: 40.0,
-      //     ),
-      //     IconButton(
-      //         icon: Icon(
-      //           Icons.people,
-      //           //color: Colors.grey,
-      //           size: 30.0,
-      //         ),
-      //         onPressed: () {Navigator.pushNamed(context, '/people');}),
-      //   ],
-      // ),
+      elevation: 8.0,
     );
   }
 
@@ -292,37 +737,39 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             width: customWidth(.025),
           ),
-          Container(
-            width: customWidth(.2),
-            padding: EdgeInsets.symmetric(horizontal: customWidth(.025)),
-            child: Column(
-              children: <Widget>[
-                CircleAvatar(
-                  radius: customWidth(.08),
-                  child: Center(
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.video_call,
-                            color: _themeController.isLite.value
-                                ? Colors.black
-                                : Colors.white,
-                            size: customWidth(.08),
-                          ),
-                          onPressed: () {})),
-                  backgroundColor: _themeController.backgroundColor,
-                ),
-                Text(
-                  "Create room",
-                  softWrap: true,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _themeController.textColor,
-                    fontSize: customWidth(.036),
+          GestureDetector(
+            onTap: () => Get.to(() => UserDayToggolPage()),
+            child: Container(
+              width: customWidth(.2),
+              padding: EdgeInsets.symmetric(horizontal: customWidth(.025)),
+              child: Column(
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: customWidth(.08),
+                    child: Center(
+                      child: Icon(
+                        Icons.video_call,
+                        color: _themeController.isLite.value
+                            ? Colors.black
+                            : Colors.white,
+                        size: customWidth(.08),
+                      ),
+                    ),
+                    backgroundColor: _themeController.backgroundColor,
                   ),
-                )
-              ],
+                  Text(
+                    "Create room",
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: _themeController.textColor,
+                      fontSize: customWidth(.036),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
           ...List.generate(
@@ -405,11 +852,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   _showPopupMenu(Offset offset) async {
+    RenderBox? overlay =
+        Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
     double left = offset.dx;
     double top = offset.dy;
     await showMenu(
       context: context,
-      position: RelativeRect.fromLTRB(left, top, 0, 0),
+      position: RelativeRect.fromLTRB(
+        left,
+        top,
+        overlay!.size.width - left,
+        overlay.size.height - top,
+      ),
       items: [
         // ...List.generate(
         //     5,
