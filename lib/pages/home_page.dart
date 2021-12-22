@@ -3,12 +3,15 @@ import 'dart:io';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
+import 'package:fakeingbar/controller/user_controller.dart';
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/pages/chat.dart';
 import 'package:fakeingbar/pages/profile_page.dart';
 import 'package:fakeingbar/pages/userday_toggol_page.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
+import 'package:fakeingbar/widgets/single_chat_row.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -26,27 +29,16 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<PopupMenuButtonState> _key = GlobalKey();
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
+  final UserController _userController = Get.find();
   TextEditingController _newChatName = TextEditingController();
 
-  final List<User> _users = [];
-
-  late List<String> menuItems;
-
-  LongPressDownDetails? _pressDetails;
-  TapDownDetails? _tabDownDetails;
+  final List<FriendList> _users = [];
 
   File? createChatImage;
 
   @override
   void initState() {
-    menuItems = [
-      "Delete",
-      "Set Seen",
-      "Set Received",
-      "Not Received",
-      "Not Send",
-    ];
-    _users.addAll(users);
+    _users.addAll(_userController.demoUsers);
     super.initState();
   }
 
@@ -61,27 +53,12 @@ class _HomePageState extends State<HomePage> {
             _appbarSection(context),
             _searchSection(),
             _daySection(),
-            // singleChatRow(
-            //   "Ankur",
-            //   "images/m2.jpg",
-            //   "Lets meet tomorrow",
-            //   " . 3:09 PM",
-            //   true,
-            //   true,
-            // ),
-            // singleChatRow(
-            //   "Stella",
-            //   "images/w2.jpg",
-            //   "Hey What's up?",
-            //   " . Wed",
-            //   true,
-            //   false,
-            // ),
             ListView(
+              physics: BouncingScrollPhysics(),
               shrinkWrap: true,
               children: [
-                ...List.generate(
-                    _users.length, (index) => singleChatRow(users[index]))
+                ...List.generate(_users.length,
+                    (index) => SingleChatRow(user: _users[index]))
               ],
             ),
             Center(
@@ -98,28 +75,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   SizedBox _bottomNav(BuildContext context) {
-    // return BottomNavigationBar(
-    // backgroundColor: _themeController.scaffoldBackgroundColor,
-    // items: const <BottomNavigationBarItem>[
-    //   BottomNavigationBarItem(
-    //     icon: Icon(
-    //       FontAwesomeIcons.solidComment,
-    //       size: 21,
-    //     ),
-    //     label: 'Chats',
-    //   ),
-    //   BottomNavigationBarItem(
-    //     icon: Icon(
-    //       Icons.people,
-    //       size: 30,
-    //     ),
-    //     label: 'People',
-    //   ),
-    // ],
-
-    // currentIndex: 0,
-    // iconSize: MediaQuery.of(context).size.width * .07,
-    // //onTap: ,
     return SizedBox(
       height: customWidth(.15),
       child: Row(
@@ -146,12 +101,12 @@ class _HomePageState extends State<HomePage> {
               value == 1
                   ? showDialog(
                       context: context,
-                      builder: (context) => _createChat(),
+                      builder: (context) => _createChatDialog(),
                     )
                   : value == 2
                       ? showDialog(
                           context: context,
-                          builder: (context) => _createGroupChat(),
+                          builder: (context) => _createGroupChatDialog(),
                         )
                       : null;
             },
@@ -231,7 +186,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Dialog _createChat() => Dialog(
+  Dialog _createChatDialog() => Dialog(
         child: IntrinsicHeight(
           // height: customWidth(1),
           child: Column(
@@ -363,7 +318,7 @@ class _HomePageState extends State<HomePage> {
         ),
       );
 
-  Dialog _createGroupChat() => Dialog(
+  Dialog _createGroupChatDialog() => Dialog(
         child: IntrinsicHeight(
           // height: customWidth(1),
           child: Column(
@@ -673,6 +628,7 @@ class _HomePageState extends State<HomePage> {
       ),
       height: customWidth(.12),
       child: TextField(
+        readOnly: true,
         strutStyle: const StrutStyle(),
         decoration: InputDecoration(
           isDense: true,
@@ -697,7 +653,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _daySingleWidget(User user) {
+  _daySingleWidget(FriendList user) {
     return Container(
       width: customWidth(.2),
       height: customWidth(.3),
@@ -731,6 +687,7 @@ class _HomePageState extends State<HomePage> {
     return SizedBox(
       height: customWidth(.3),
       child: ListView(
+        physics: BouncingScrollPhysics(),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         children: [
@@ -773,148 +730,9 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           ...List.generate(
-              users.length, (index) => _daySingleWidget(users[index])),
+              _users.length, (index) => _daySingleWidget(_users[index])),
         ],
       ),
     );
-  }
-
-  singleChatRow(User user) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: customWidth(.05),
-        right: customWidth(.05),
-        bottom: customWidth(0.05),
-      ),
-      child: GestureDetector(
-        onTap: () {
-          Get.to(() => Chat(
-                user: user,
-              ));
-        },
-        onLongPressDown: (pressDetails) {
-          setState(() {
-            _pressDetails = pressDetails;
-          });
-        },
-        onLongPress: () {
-          _showPopupMenu(_pressDetails!.globalPosition);
-        },
-        child: Container(
-          decoration: const BoxDecoration(shape: BoxShape.circle),
-          child: Row(
-            children: <Widget>[
-              CustomeCircleAvatar(
-                hasDay: user.hasDay,
-                imageUrl: user.imageUrl,
-                isOnline: user.isOnline,
-              ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    user.name,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: _themeController.darkenTextColor,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 4.0,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        user.msg,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(
-                        height: 2.0,
-                      ),
-                      Text(
-                        user.lastOnlineTime,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                      ),
-                    ],
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  _showPopupMenu(Offset offset) async {
-    RenderBox? overlay =
-        Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
-    double left = offset.dx;
-    double top = offset.dy;
-    await showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        left,
-        top,
-        overlay!.size.width - left,
-        overlay.size.height - top,
-      ),
-      items: [
-        // ...List.generate(
-        //     5,
-        //     (index) => PopupMenuItem(
-        //           child: Text(menuItems[index]),
-        //           value: index,
-        //           onTap: () => print(index),
-        //         ))
-        PopupMenuItem(
-          child: Text(menuItems[0]),
-          onTap: () => _menuIndexedFunction(0),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[1]),
-          onTap: () => _menuIndexedFunction(1),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[2]),
-          onTap: () => _menuIndexedFunction(2),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[3]),
-          onTap: () => _menuIndexedFunction(3),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[4]),
-          onTap: () => _menuIndexedFunction(4),
-        ),
-      ],
-      elevation: 8.0,
-    );
-  }
-
-  _menuIndexedFunction(int item) {
-    switch (item) {
-      case 0:
-        print("$item Delete.............");
-        break;
-      case 1:
-        print("$item Set Seen............");
-        break;
-      case 2:
-        print("$item Set Received..............");
-        break;
-      case 3:
-        print("$item Not Received...............");
-        break;
-      case 4:
-        print("$item Not Send...............");
-        break;
-      default:
-    }
   }
 }

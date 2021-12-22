@@ -1,66 +1,86 @@
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController {
-  final List<User> _demoUsers = [
-    User(
+  final List<FriendList> demoUsers = [
+    FriendList(
       id: 1,
-      name: "Evan Hossain",
-      imageUrl: "images/w1.jpg",
-      msg: "Lets meet tomorrow",
-      lastOnlineTime: " . 3:09 PM",
+      name: "Evan",
+      imageUrl: "images/w2.jpg",
+      lastMessageTime: DateTime.now(),
+      messageStatus: "not send",
       isOnline: true,
+      isBlock: false,
+      lastMessage: "lastMessage",
       hasDay: true,
-      isBlock: true,
+      chatColor: 1,
+      inactiveTime: "Active",
+      welcomeMessage: "You'r friends on Facebook",
+      address: "Dubai",
+      hasGroup: false,
     ),
-    User(
+    FriendList(
       id: 2,
       name: "Ankur",
       imageUrl: "images/m2.jpg",
-      msg: "Lets meet tomorrow",
-      lastOnlineTime: " . 3:09 PM",
+      lastMessageTime: DateTime.now(),
+      messageStatus: "not received",
       isOnline: false,
-      hasDay: true,
       isBlock: false,
+      lastMessage: "Lets meet tomorrow",
+      hasDay: false,
+      chatColor: 1,
+      inactiveTime: "Active",
+      welcomeMessage: "welcomeMessage",
+      address: "address",
+      hasGroup: false,
     ),
-    User(
+    FriendList(
       id: 3,
       name: "Stella",
       imageUrl: "images/w2.jpg",
-      msg: "Hey What's up?",
-      lastOnlineTime: " . Wed",
+      lastMessageTime: DateTime.now(),
+      messageStatus: "received",
       isOnline: true,
-      hasDay: false,
       isBlock: false,
+      lastMessage: "Hey What's up?",
+      hasDay: true,
+      chatColor: 1,
+      inactiveTime: "Active",
+      welcomeMessage: "welcomeMessage",
+      address: "address",
+      hasGroup: false,
     ),
-    User(
+    FriendList(
       id: 4,
       name: "Gabriela",
       imageUrl: "images/w1.jpg",
-      msg: "Lets meet tomorrow",
-      lastOnlineTime: " . 3:09 PM",
-      isOnline: true,
-      hasDay: true,
+      lastMessageTime: DateTime.now(),
+      messageStatus: "seen",
+      isOnline: false,
       isBlock: false,
-    ),
-    User(
-      id: 5,
-      name: "Rudolf",
-      imageUrl: "images/w1.jpg",
-      msg: "Lets meet tomorrow",
-      lastOnlineTime: " . 3:09 PM",
-      isOnline: true,
-      hasDay: true,
-      isBlock: false,
+      lastMessage: "Lets meet tomorrow",
+      hasDay: false,
+      chatColor: 1,
+      inactiveTime: "Active",
+      welcomeMessage: "welcomeMessage",
+      address: "address",
+      hasGroup: false,
     ),
   ].obs;
 
-  List<User> get users {
-    return _demoUsers;
+  List<FriendList> get users {
+    return demoUsers;
   }
 
-  bool changeUserDay(User user) {
-    User newuser = _demoUsers.firstWhere((element) => element.id == user.id);
+  set setUser(FriendList user) {
+    demoUsers.add(user);
+  }
+
+  bool changeUserDay(FriendList user) {
+    FriendList newuser =
+        demoUsers.firstWhere((element) => element.id == user.id);
     return newuser.hasDay == true
         ? newuser.hasDay = false
         : newuser.hasDay = true;

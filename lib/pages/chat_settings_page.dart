@@ -1,4 +1,5 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ import '../config.dart';
 
 class ChatSettingsPage extends StatefulWidget {
   ChatSettingsPage({Key? key, required this.user}) : super(key: key);
-  final User user;
+  final FriendList user;
 
   @override
   State<ChatSettingsPage> createState() => _ChatSettingsPageState();
@@ -18,7 +19,7 @@ class _ChatSettingsPageState extends State<ChatSettingsPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _activeController = TextEditingController();
 
-  final ThemeController _themeController = ThemeController();
+  final ThemeController _themeController = Get.find();
 
   int _radioSelected = 1;
   int _selectedChatColor = 0;

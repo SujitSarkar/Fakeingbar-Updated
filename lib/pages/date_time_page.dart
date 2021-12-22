@@ -13,19 +13,25 @@ class DateTimePage extends StatefulWidget {
 
 class _DateTimePageState extends State<DateTimePage> {
   final TextEditingController _dateTimeController = TextEditingController();
-  int _radioSelected = 1;
+  int _radioSelected = 0;
 
-  final _showDateTime = false.obs;
+  final _showDate = false.obs;
+  final _showTime = false.obs;
   bool _is24Hour = false;
 
-  TimeOfDay _time =
-      TimeOfDay(hour: DateTime.now().hour, minute: DateTime.now().minute);
+  TimeOfDay _time = TimeOfDay.now();
   DateTime _date = DateTime(DateTime.now().year);
 
   @override
   Widget build(BuildContext context) {
-    _dateTimeController.text =
-        "${DateFormat('EEE, M/d/y').format(_date)} ${_time.format(context)}";
+    DateTime tempTime = DateFormat("hh:mm")
+        .parse(_time.hour.toString() + ":" + _time.minute.toString());
+    String formatedTime = _showTime.isTrue
+        ? DateFormat(_is24Hour ? "HH:mm:ss" : "h:mm a").format(tempTime)
+        : "";
+    String formatedDate =
+        _showDate.isTrue ? DateFormat('yMMMd').format(_date) + " AT " : "";
+    _dateTimeController.text = "$formatedDate $formatedTime";
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -51,7 +57,8 @@ class _DateTimePageState extends State<DateTimePage> {
                     onChanged: (value) {
                       setState(() {
                         _radioSelected = value!;
-                        _showDateTime.value = false;
+                        _showDate.value = false;
+                        _showTime.value = true;
                       });
                     },
                   ),
@@ -64,7 +71,8 @@ class _DateTimePageState extends State<DateTimePage> {
                     onChanged: (value) {
                       setState(() {
                         _radioSelected = value!;
-                        _showDateTime.value = true;
+                        _showDate.value = true;
+                        _showTime.value = true;
                       });
                     },
                   ),
@@ -77,7 +85,8 @@ class _DateTimePageState extends State<DateTimePage> {
                     onChanged: (value) {
                       setState(() {
                         _radioSelected = value!;
-                        _showDateTime.value = true;
+                        _showDate.value = true;
+                        _showTime.value = true;
                       });
                     },
                   ),
@@ -95,24 +104,28 @@ class _DateTimePageState extends State<DateTimePage> {
                       )
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        "Set Time",
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: SThemeData.lightThemeColor,
-                        ),
-                        onPressed: () => _selectTime(),
-                        child: Text("Set Time"),
-                      )
-                    ],
+                  Obx(
+                    () => _showTime.isTrue
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                "Set Time",
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: SThemeData.lightThemeColor,
+                                ),
+                                onPressed: () => _selectTime(),
+                                child: Text("Set Time"),
+                              )
+                            ],
+                          )
+                        : Container(),
                   ),
                   Obx(
-                    () => _showDateTime.isTrue
+                    () => _showDate.isTrue
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [

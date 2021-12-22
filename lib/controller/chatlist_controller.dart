@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:fakeingbar/controller/user_controller.dart';
 import 'package:fakeingbar/models/chat_list.dart';
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ChatListController extends GetxController {
+class ChatListController extends UserController {
   final List<ChatList> _chatlist = [];
 
   List<ChatList> get chatlist {
@@ -39,24 +41,21 @@ class ChatListController extends GetxController {
   var isUserBlocked = false.obs;
   File? imageFile;
 
-  void addNewChat({
-    required String name,
-    required String imageUrl,
-    required String msg,
-    required String lastOnlineTime,
-    required bool isOnline,
-    required bool hasDay,
-    required bool isBlock,
-  }) {
-    users.add(User(
-        id: 6,
+  void addNewChat(
+      {required String name,
+      required String imageUrl,
+      required String msg,
+      required String lastOnlineTime,
+      required bool isOnline,
+      required bool hasDay,
+      required bool isBlock}) {
+    demoUsers.add(FriendList(
+        id: 5,
         name: name,
         imageUrl: imageUrl,
-        msg: msg,
-        lastOnlineTime: lastOnlineTime,
-        isOnline: isOnline,
-        hasDay: hasDay,
-        isBlock: isBlock));
+        lastMessageTime: DateTime.now(),
+        lastMessage: msg,
+        inactiveTime: "inactiveTime"));
     demoChatList.add(
       ChatList(
         id: 6,

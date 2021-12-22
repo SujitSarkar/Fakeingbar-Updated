@@ -6,10 +6,10 @@ class FriendList {
   final String imageUrl;
   final DateTime lastMessageTime;
   final String messageStatus;
-  final bool isActive;
+  final bool isOnline;
   final bool isBlock;
   final String lastMessage;
-  final bool hasStory;
+  bool hasDay;
   final int chatColor;
   final String inactiveTime;
   final String welcomeMessage;
@@ -21,16 +21,16 @@ class FriendList {
     required this.name,
     required this.imageUrl,
     required this.lastMessageTime,
-    required this.messageStatus,
-    required this.isActive,
-    required this.isBlock,
     required this.lastMessage,
-    required this.hasStory,
-    required this.chatColor,
     required this.inactiveTime,
-    required this.welcomeMessage,
-    required this.address,
-    required this.hasGroup,
+    this.messageStatus = "not recived",
+    this.isOnline = true,
+    this.isBlock = false,
+    this.hasDay = false,
+    this.chatColor = 0,
+    this.welcomeMessage = "You're friends on Facebook",
+    this.address = "Lives in UK",
+    this.hasGroup = false,
   });
 }
 
@@ -41,10 +41,42 @@ List<FriendList> friendList = [
     imageUrl: "images/w2.jpg",
     lastMessageTime: DateTime.now(),
     messageStatus: "not received",
-    isActive: true,
+    isOnline: true,
     isBlock: false,
     lastMessage: "lastMessage",
-    hasStory: true,
+    hasDay: true,
+    chatColor: 1,
+    inactiveTime: "Active",
+    welcomeMessage: "welcomeMessage",
+    address: "address",
+    hasGroup: false,
+  ),
+  FriendList(
+    id: 2,
+    name: "Ankur",
+    imageUrl: "images/m2.jpg",
+    lastMessageTime: DateTime.now(),
+    messageStatus: "not received",
+    isOnline: true,
+    isBlock: false,
+    lastMessage: "Lets meet tomorrow",
+    hasDay: true,
+    chatColor: 1,
+    inactiveTime: "Active",
+    welcomeMessage: "welcomeMessage",
+    address: "address",
+    hasGroup: false,
+  ),
+  FriendList(
+    id: 3,
+    name: "Stella",
+    imageUrl: "images/w2.jpg",
+    lastMessageTime: DateTime.now(),
+    messageStatus: "not received",
+    isOnline: true,
+    isBlock: false,
+    lastMessage: "Hey What's up?",
+    hasDay: true,
     chatColor: 1,
     inactiveTime: "Active",
     welcomeMessage: "welcomeMessage",

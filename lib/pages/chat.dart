@@ -4,6 +4,7 @@ import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/chat_list.dart';
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
@@ -24,7 +25,7 @@ import 'package:get/get.dart';
 // ];
 
 class Chat extends StatefulWidget {
-  final User user;
+  final FriendList user;
   const Chat({Key? key, required this.user}) : super(key: key);
 
   @override
@@ -40,7 +41,7 @@ class _ChatState extends State<Chat> {
   List<ChatList> _chatList = [];
   List<String> chatSetting = [];
 
-  TapDownDetails? _pressDetails;
+  final _textBox = "".obs;
 
   @override
   void initState() {
@@ -57,48 +58,79 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            _buildAppBar(),
-            _buildChat(),
-            _buildBottomChat(),
-          ],
-        ),
+      body: Column(
+        children: <Widget>[
+          _buildAppBar(),
+          _buildChat(),
+          _buildBottomChat(),
+        ],
       ),
     );
   }
 
-  Expanded _buildChat() {
+  _buildChat() {
     return Expanded(
-      child: ListView.builder(
-        reverse: true,
-        itemBuilder: (BuildContext context, int index) {
-          // if (index != ListYourFriendChat.length - 1) {
-          return ListView(
-            shrinkWrap: true,
-            children: [
-              Column(
-                children: [
-                  CustomeCircleAvatar(
-                    hasDay: widget.user.hasDay,
-                    imageUrl: widget.user.imageUrl,
-                    isOnline: widget.user.isOnline,
-                  ),
-                  Text(widget.user.name),
-                  
-                ],
+      child: SingleChildScrollView(
+        physics: ClampingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            CustomeCircleAvatar(
+              hasDay: false,
+              imageUrl: widget.user.imageUrl,
+              isOnline: false,
+              picRadius: 50,
+            ),
+            SizedBox(
+              height: customWidth(.03),
+            ),
+            Text(
+              widget.user.name,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: customWidth(.065),
+                color: _themeController.textColor,
               ),
-              ChatBubble(
-                chatList: _chatList[index],
-                user: widget.user,
+            ),
+            SizedBox(
+              height: customWidth(.015),
+            ),
+            Text(
+              widget.user.welcomeMessage,
+              style: TextStyle(
+                color: _themeController.textColor,
               ),
-            ],
-          );
-          //} else {
-          //return
-        },
-        itemCount: _chatList.length,
+            ),
+            SizedBox(
+              height: customWidth(.015),
+            ),
+            Text(
+              "Lives in ${widget.user.address}",
+              style: TextStyle(
+                color: _themeController.darkenTextColor,
+              ),
+            ),
+            SizedBox(
+              height: customWidth(.03),
+            ),
+            ListView.builder(
+              reverse: true,
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                // if (index != ListYourFriendChat.length - 1) {
+                return ChatBubble(
+                  chatList: _chatList[index],
+                  user: widget.user,
+                );
+                //} else {
+                //return
+              },
+              itemCount: _chatList.length,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -112,18 +144,18 @@ class _ChatState extends State<Chat> {
       imageUrl: widget.user.imageUrl, //widget.friendItem!.imageAvatarUrl,
       subTitle: widget.user.isOnline == true
           ? 'Active now'
-          : "Active ${widget.user.lastOnlineTime}",
+          : "Active ${widget.user.inactiveTime}",
       user: widget.user,
     );
   }
 
   _buildBottomChat() {
-    return Obx(() => _chatListController.isUserBlocked.isTrue
+    return Obx(() => _chatListController.isUserBlocked.isFalse
         ? Container(
             decoration: BoxDecoration(
               color: _themeController.scaffoldBackgroundColor,
             ),
-            padding: const EdgeInsets.only(top: 5.0, bottom: 20.0, left: 10),
+            padding: const EdgeInsets.only(top: 5.0, bottom: 10.0, left: 10),
             child: Row(
               children: <Widget>[
                 Container(
@@ -166,6 +198,9 @@ class _ChatState extends State<Chat> {
                     width: MediaQuery.of(context).size.width - 40,
                     height: MediaQuery.of(context).size.width * .11,
                     child: TextField(
+                      onChanged: (value) {
+                        _textBox.value = value;
+                      },
                       decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(10.0),
                           border: OutlineInputBorder(
@@ -188,21 +223,26 @@ class _ChatState extends State<Chat> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      FontAwesomeIcons.solidThumbsUp,
-                      size: 22.0,
-                      color: Colors.deepPurpleAccent,
+                Obx(
+                  () => Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: customWidth(0.03)),
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: Icon(
+                        _textBox.isEmpty
+                            ? FontAwesomeIcons.solidThumbsUp
+                            : Icons.send,
+                        size: 22.0,
+                        color: Colors.deepPurpleAccent,
+                      ),
                     ),
                   ),
                 )
               ],
             ))
         : Container(
-            height: customWidth(.2),
+            height: customWidth(.175),
             width: double.infinity,
             color: SThemeData.lightThemeColor,
             alignment: Alignment.center,

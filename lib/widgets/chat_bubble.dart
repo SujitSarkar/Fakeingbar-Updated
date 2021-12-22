@@ -1,9 +1,11 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/chat_list.dart';
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../config.dart';
@@ -17,7 +19,7 @@ class ChatBubble extends StatefulWidget {
   }) : super(key: key);
 
   final ChatList chatList;
-  final User user;
+  final FriendList user;
 
   @override
   State<ChatBubble> createState() => _ChatBubbleState();
@@ -39,8 +41,8 @@ class _ChatBubbleState extends State<ChatBubble> {
       "Delete",
       "Set Seen",
       "Set Received",
-      "Not Received",
-      "Not Send",
+      "Set Not Received",
+      "Set Not Send",
     ];
     super.initState();
   }
@@ -54,71 +56,52 @@ class _ChatBubbleState extends State<ChatBubble> {
             horizontal: 16.0,
             vertical: 2.0,
           ),
+          margin: const EdgeInsets.only(top: 10),
           child: GestureDetector(
-            // onLongPress: () => _showPopupMenu(_pressDetails!.globalPosition),
-            // onLongPressDown: (details) {
-            //   setState(() {
-            //     _pressDetails = details;
-            //   });
-            // },
-            child: PopupMenuButton<int>(
-              key: _key,
-              itemBuilder: (context) {
-                return [
-                  ...List.generate(
-                    menuItems.length,
-                    (index) => PopupMenuItem(
-                      value: index,
-                      child: Text(menuItems[index]),
-                    ),
-                  )
-                ];
-              },
-              onSelected: (value) => _menuIndexedFunction(value),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(
-                    height: customWidth(.08),
-                    width: customWidth(.08),
-                    child: CustomeCircleAvatar(
-                      dotSize: customWidth(.032),
-                      borderWidth: 2,
-                      isOnline: widget.user.isOnline,
-                      hasDay: widget.user.hasDay,
-                      imageUrl: widget.user.imageUrl,
-                    ),
+            onLongPress: () => _showBottomMenu(),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(
+                  height: customWidth(.08),
+                  width: customWidth(.08),
+                  child: CustomeCircleAvatar(
+                    onlineDotSize: customWidth(.032),
+                    borderWidth: 2,
+                    isOnline: widget.user.isOnline,
+                    hasDay: widget.user.hasDay,
+                    imageUrl: widget.user.imageUrl,
                   ),
-                  const SizedBox(width: 15.0),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(
-                      vertical: customWidth(.025),
-                      horizontal: customWidth(.04),
-                    ),
-                    decoration: BoxDecoration(
-                      color: _themeController.chatBGColor,
-                      borderRadius: BorderRadius.circular(customWidth(.05)),
-                    ),
-                    child: Container(
-                      constraints: BoxConstraints(maxWidth: customWidth(.5)),
-                      child: Text(
-                        widget.chatList.receiveMessage,
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                        textWidthBasis: TextWidthBasis.longestLine,
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: _themeController.textColor,
-                          fontWeight: FontWeight.w400,
-                          height: 1.3,
-                        ),
+                ),
+                const SizedBox(width: 15.0),
+                Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(
+                    vertical: customWidth(.025),
+                    horizontal: customWidth(.04),
+                  ),
+                  decoration: BoxDecoration(
+                    color: _themeController.chatBGColor,
+                    borderRadius: BorderRadius.circular(customWidth(.05)),
+                  ),
+                  child: Container(
+                    constraints: BoxConstraints(maxWidth: customWidth(.5)),
+                    child: Text(
+                      widget.chatList.receiveMessage,
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                      textWidthBasis: TextWidthBasis.longestLine,
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: _themeController.textColor,
+                        fontWeight: FontWeight.w400,
+                        height: 1.3,
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
           ),
         ),
@@ -129,12 +112,7 @@ class _ChatBubbleState extends State<ChatBubble> {
             vertical: 2.0,
           ),
           child: GestureDetector(
-            onLongPress: () => _showPopupMenu(_pressDetails!.globalPosition),
-            onLongPressDown: (details) {
-              setState(() {
-                _pressDetails = details;
-              });
-            },
+            onLongPress: () => _showBottomMenu(),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.end,
@@ -183,56 +161,63 @@ class _ChatBubbleState extends State<ChatBubble> {
     );
   }
 
-  _showPopupMenu(Offset offset) async {
-    RenderBox? overlay =
-        Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
-    double left = offset.dx;
-    double top = offset.dy;
-    await showMenu(
+  _showBottomMenu() {
+    showModalBottomSheet(
       context: context,
-      position: RelativeRect.fromLTRB(
-        left,
-        top,
-        overlay!.size.width - left,
-        overlay.size.height - top,
-      ),
-      items: [
-        // ...List.generate(
-        //     5,
-        //     (index) => PopupMenuItem(
-        //           child: Text(menuItems[index]),
-        //           value: index,
-        //           onTap: () => print(index),
-        //         ))
-        PopupMenuItem(
-          child: Text(menuItems[0]),
-          onTap: () => _menuIndexedFunction(0),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[1]),
-          onTap: () => _menuIndexedFunction(1),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[2]),
-          onTap: () => _menuIndexedFunction(2),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[3]),
-          onTap: () => _menuIndexedFunction(3),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[4]),
-          onTap: () => _menuIndexedFunction(4),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[5]),
-          onTap: () => _menuIndexedFunction(5),
-        ),
-        PopupMenuItem(
-          child: Text(menuItems[6]),
-          onTap: () => _menuIndexedFunction(6),
-        ),
-      ],
+      builder: (context) {
+        final theme = Theme.of(context);
+        return Container(
+          color:
+              _themeController.isLite.isTrue ? Color(0xff737373) : Colors.black,
+          child: Container(
+            decoration: BoxDecoration(
+              color: _themeController.isLite.isFalse
+                  ? Color(0xff222222)
+                  : _themeController.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(customWidth(.05)),
+                topRight: Radius.circular(
+                  customWidth(.05),
+                ),
+              ),
+            ),
+            child: Wrap(
+              alignment: WrapAlignment.spaceEvenly,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ...List.generate(
+                  menuItems.length,
+                  (index) => GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      _menuIndexedFunction(index);
+                    },
+                    child: Container(
+                      height: customWidth(.15),
+                      width: customWidth(.2),
+                      padding: EdgeInsets.all(customWidth(.015)),
+                      margin: EdgeInsets.symmetric(
+                          horizontal: customWidth(.01),
+                          vertical: customWidth(.02)),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: _themeController.chatBGColor,
+                        borderRadius: BorderRadius.circular(customWidth(.05)),
+                      ),
+                      child: Text(
+                        menuItems[index],
+                        maxLines: 2,
+                        softWrap: true,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
       elevation: 8.0,
     );
   }

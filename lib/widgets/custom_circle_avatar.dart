@@ -13,18 +13,19 @@ class CustomeCircleAvatar extends StatelessWidget {
   CustomeCircleAvatar({
     Key? key,
     required this.imageUrl,
-    this.dotSize,
-    this.borderWidth,
-    this.isBlock,
+    this.onlineDotSize,
+    this.borderWidth = 3,
+    this.isBlock = false,
     required this.hasDay,
     required this.isOnline,
+    this.picRadius,
   }) : super(key: key);
   final String imageUrl;
-
-  final double? dotSize;
-  final double? borderWidth;
-  final bool? isBlock;
+  final double? onlineDotSize;
+  final double borderWidth;
+  final bool isBlock;
   final bool hasDay, isOnline;
+  final double? picRadius;
 
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
@@ -34,6 +35,7 @@ class CustomeCircleAvatar extends StatelessWidget {
     File? imageFile = _chatListController.imageFile;
     return Stack(
       fit: StackFit.passthrough,
+      alignment: Alignment.center,
       children: [
         hasDay
             ? Container(
@@ -59,25 +61,25 @@ class CustomeCircleAvatar extends StatelessWidget {
                         ? AssetImage(imageUrl)
                         : FileImage(_chatListController.imageFile!)
                             as ImageProvider,
-                    radius: customWidth(.05),
+                    radius: picRadius ?? customWidth(.05),
                   ),
                 ),
               )
             : CircleAvatar(
                 backgroundImage: AssetImage(imageUrl),
-                radius: customWidth(.08),
+                radius: picRadius ?? customWidth(.08),
               ),
-        isOnline == true && isBlock == true
+        isOnline == true && isBlock == false
             ? Positioned(
                 right: 0,
                 bottom: 0,
                 child: Container(
-                  width: dotSize ?? customWidth(.05),
-                  height: dotSize ?? customWidth(.05),
+                  width: onlineDotSize ?? customWidth(.05),
+                  height: onlineDotSize ?? customWidth(.05),
                   decoration: BoxDecoration(
                       color: const Color(0xff4DC82C),
                       border: Border.all(
-                        width: borderWidth ?? 3,
+                        width: borderWidth,
                         color: _themeController.scaffoldBackgroundColor,
                       ),
                       borderRadius: BorderRadius.circular(15.0)),

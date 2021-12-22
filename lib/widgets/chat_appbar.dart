@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/pages/audio_call_page.dart';
 import 'package:fakeingbar/pages/chat_settings_page.dart';
@@ -22,7 +23,7 @@ class ChatAppBarAction extends StatefulWidget {
   final bool isBack;
   final String subTitle;
   final String imageUrl;
-  final User user;
+  final FriendList user;
 
   ChatAppBarAction({
     Key? key,
@@ -43,8 +44,6 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
   GlobalKey<PopupMenuButtonState> _key = GlobalKey();
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
-
-  TapDownDetails? _pressDetails;
 
   List<String> chatSetting = [];
 
@@ -126,7 +125,7 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                   ),
                   SizedBox(height: 3),
                   Obx(() => Text(
-                        _chatListController.isUserBlocked.isTrue
+                        _chatListController.isUserBlocked.isFalse
                             ? widget.subTitle
                             : "",
                         style: TextStyle(color: Colors.grey, fontSize: 11.0),
@@ -143,7 +142,7 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Obx(
-                    () => _chatListController.isUserBlocked.isTrue
+                    () => _chatListController.isUserBlocked.isFalse
                         ? InkWell(
                             onTap: () {
                               Get.to(() => AudioCall(
@@ -162,7 +161,7 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                           ),
                   ),
                   Obx(
-                    () => _chatListController.isUserBlocked.isTrue
+                    () => _chatListController.isUserBlocked.isFalse
                         ? Row(
                             children: [
                               InkWell(
