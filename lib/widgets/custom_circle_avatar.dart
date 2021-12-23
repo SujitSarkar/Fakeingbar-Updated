@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

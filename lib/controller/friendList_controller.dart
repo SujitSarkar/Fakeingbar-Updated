@@ -1,11 +1,10 @@
 import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/user.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
-class UserController extends GetxController {
-  final List<FriendList> demoUsers = [
-    FriendList(
-      id: 1,
+class FriendListController extends GetxController {
+  final List<FriendListModel> demoUsers = [
+    FriendListModel(
       name: "Evan",
       imageUrl: "images/w2.jpg",
       lastMessageTime: DateTime.now(),
@@ -20,8 +19,7 @@ class UserController extends GetxController {
       address: "Dubai",
       hasGroup: false,
     ),
-    FriendList(
-      id: 2,
+    FriendListModel(
       name: "Ankur",
       imageUrl: "images/m2.jpg",
       lastMessageTime: DateTime.now(),
@@ -36,8 +34,7 @@ class UserController extends GetxController {
       address: "address",
       hasGroup: false,
     ),
-    FriendList(
-      id: 3,
+    FriendListModel(
       name: "Stella",
       imageUrl: "images/w2.jpg",
       lastMessageTime: DateTime.now(),
@@ -52,8 +49,7 @@ class UserController extends GetxController {
       address: "address",
       hasGroup: false,
     ),
-    FriendList(
-      id: 4,
+    FriendListModel(
       name: "Gabriela",
       imageUrl: "images/w1.jpg",
       lastMessageTime: DateTime.now(),
@@ -70,19 +66,28 @@ class UserController extends GetxController {
     ),
   ].obs;
 
-  List<FriendList> get users {
+  List<FriendListModel> get users {
     return demoUsers;
   }
 
-  set setUser(FriendList user) {
+  set setUser(FriendListModel user) {
     demoUsers.add(user);
   }
 
-  bool changeUserDay(FriendList user) {
-    FriendList newuser =
+  bool changeUserDay(FriendListModel user) {
+    FriendListModel newuser =
         demoUsers.firstWhere((element) => element.id == user.id);
     return newuser.hasDay == true
         ? newuser.hasDay = false
         : newuser.hasDay = true;
+  }
+
+  Future<String?> pickImage() async {
+    ImagePicker _picker = ImagePicker();
+    await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
+      if (xFile != null) {
+        return xFile.path;
+      }
+    });
   }
 }

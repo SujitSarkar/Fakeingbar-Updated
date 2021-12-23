@@ -4,7 +4,6 @@ import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/pages/audio_call_page.dart';
 import 'package:fakeingbar/pages/chat_settings_page.dart';
 import 'package:fakeingbar/pages/date_time_page.dart';
@@ -23,7 +22,7 @@ class ChatAppBarAction extends StatefulWidget {
   final bool isBack;
   final String subTitle;
   final String imageUrl;
-  final FriendList user;
+  final FriendListModel user;
 
   ChatAppBarAction({
     Key? key,
@@ -99,9 +98,9 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                 width: customWidth(.11),
                 child: CustomeCircleAvatar(
                   isBlock: _chatListController.isUserBlocked.value,
-                  hasDay: widget.user.hasDay,
-                  imageUrl: widget.user.imageUrl,
-                  isOnline: widget.user.isOnline,
+                  hasDay: widget.user.hasDay!,
+                  imageUrl: widget.user.imageUrl!,
+                  isOnline: widget.user.isOnline!,
                 ),
               ),
               SizedBox(
@@ -114,7 +113,7 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                   Container(
                     width: 100.0,
                     child: Text(
-                      widget.user.name,
+                      widget.user.name!,
                       style: TextStyle(
                         color: _themeController.textColor,
                         fontSize: 16.0,

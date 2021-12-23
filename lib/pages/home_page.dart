@@ -3,16 +3,15 @@ import 'dart:io';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/controller/user_controller.dart';
+import 'package:fakeingbar/controller/friendList_controller.dart';
+import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
+import 'package:fakeingbar/models/chat_list.dart';
 import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/user.dart';
-import 'package:fakeingbar/pages/chat.dart';
 import 'package:fakeingbar/pages/profile_page.dart';
 import 'package:fakeingbar/pages/userday_toggol_page.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:fakeingbar/widgets/single_chat_row.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -29,16 +28,17 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<PopupMenuButtonState> _key = GlobalKey();
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
-  final UserController _userController = Get.find();
+  final FriendListController _friendListController = Get.find();
+  final DatabaseController _databaseController = Get.find();
   TextEditingController _newChatName = TextEditingController();
 
-  final List<FriendList> _users = [];
+  final List<FriendListModel> _users = [];
 
-  File? createChatImage;
+  String? friendListUserImage;
 
   @override
   void initState() {
-    _users.addAll(_userController.demoUsers);
+    _users.addAll(_friendListController.demoUsers);
     super.initState();
   }
 
@@ -218,8 +218,8 @@ class _HomePageState extends State<HomePage> {
                 height: customWidth(.05),
               ),
               GestureDetector(
-                onTap: () async =>
-                    createChatImage = await _chatListController.pickImage(),
+                onTap: () async => friendListUserImage =
+                    await _friendListController.pickImage(),
                 child: Container(
                   width: customWidth(.2),
                   height: customWidth(.2),
@@ -234,12 +234,12 @@ class _HomePageState extends State<HomePage> {
                   child: Stack(
                     alignment: AlignmentDirectional.center,
                     children: [
-                      createChatImage == null
+                      friendListUserImage == null
                           ? Image.asset(
                               "images/person.png",
                               fit: BoxFit.contain,
                             )
-                          : Image.file(createChatImage!),
+                          : Image.file(File(friendListUserImage!)),
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -285,8 +285,9 @@ class _HomePageState extends State<HomePage> {
                     style: ElevatedButton.styleFrom(
                       primary: SThemeData.lightThemeColor,
                     ),
-                    onPressed: () {
-                      if (_newChatName.text != "") {
+                    onPressed: () async {
+                      if (_newChatName.text != "" &&
+                          friendListUserImage!.isNotEmpty) {
                         _chatListController.addNewChat(
                           name: _newChatName.text,
                           imageUrl: "images/person.png",
@@ -296,6 +297,23 @@ class _HomePageState extends State<HomePage> {
                           hasDay: true,
                           isBlock: false,
                         );
+                        int id = await _databaseController
+                            .insertUser(FriendListModel(
+                          name: _newChatName.text,
+                          imageUrl: friendListUserImage,
+                          lastMessageTime: DateTime.now(),
+                          lastMessage: "",
+                          inactiveTime: "",
+                        ));
+                        _databaseController.insertChat(ChatListModel(
+                            friendListID: id,
+                            sendMessage: '',
+                            memberID: '',
+                            receiveMessage: "",
+                            senderTime: DateTime.now(),
+                            receiveTime: DateTime.now(),
+                            isReceived: "not received"));
+
                         Navigator.pop(context);
                       }
                     },
@@ -351,7 +369,7 @@ class _HomePageState extends State<HomePage> {
               ),
               GestureDetector(
                 onTap: () async =>
-                    createChatImage = await _chatListController.pickImage(),
+                    friendListUserImage = await _chatListController.pickImage(),
                 child: Container(
                   width: customWidth(.2),
                   height: customWidth(.2),
@@ -366,12 +384,12 @@ class _HomePageState extends State<HomePage> {
                   child: Stack(
                     alignment: AlignmentDirectional.center,
                     children: [
-                      createChatImage == null
+                      friendListUserImage == null
                           ? Image.asset(
                               "images/person.png",
                               fit: BoxFit.contain,
                             )
-                          : Image.file(createChatImage!),
+                          : Image.file(File(friendListUserImage!)),
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -653,7 +671,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _daySingleWidget(FriendList user) {
+  _daySingleWidget(FriendListModel user) {
     return Container(
       width: customWidth(.2),
       height: customWidth(.3),
@@ -662,13 +680,13 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: <Widget>[
           CustomeCircleAvatar(
-            hasDay: user.hasDay,
-            imageUrl: user.imageUrl,
-            isOnline: user.isOnline,
+            hasDay: user.hasDay!,
+            imageUrl: user.imageUrl!,
+            isOnline: user.isOnline!,
           ),
           Container(
             child: Text(
-              user.name,
+              user.name!,
               softWrap: true,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
