@@ -62,9 +62,7 @@ class _SingleChatRowState extends State<SingleChatRow> {
           child: Row(
             children: <Widget>[
               CustomeCircleAvatar(
-                hasDay: widget.user.hasDay!,
-                imageUrl: widget.user.imageUrl!,
-                isOnline: widget.user.isOnline!,
+                user: widget.user,
               ),
               SizedBox(
                 width: 10.0,
@@ -87,7 +85,10 @@ class _SingleChatRowState extends State<SingleChatRow> {
                     children: <Widget>[
                       Text(
                         widget.user.lastMessage!,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: _themeController.darkenTextColor,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(
@@ -132,9 +133,7 @@ class _SingleChatRowState extends State<SingleChatRow> {
                                   width: customWidth(.05),
                                   height: customWidth(.05),
                                   child: CustomeCircleAvatar(
-                                    imageUrl: widget.user.imageUrl!,
-                                    hasDay: false,
-                                    isOnline: false,
+                                    user: widget.user,
                                   ),
                                 )
                               : SizedBox()

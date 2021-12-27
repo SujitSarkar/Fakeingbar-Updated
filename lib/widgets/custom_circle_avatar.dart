@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
+import 'package:fakeingbar/models/friend_list.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,19 +12,15 @@ import '../config.dart';
 class CustomeCircleAvatar extends StatelessWidget {
   CustomeCircleAvatar({
     Key? key,
-    required this.imageUrl,
+    required this.user,
     this.onlineDotSize,
     this.borderWidth = 3,
-    this.isBlock = false,
-    required this.hasDay,
-    required this.isOnline,
     this.picRadius,
   }) : super(key: key);
-  final String imageUrl;
+
+  final FriendListModel user;
   final double? onlineDotSize;
   final double borderWidth;
-  final bool isBlock;
-  final bool hasDay, isOnline;
   final double? picRadius;
 
   final ThemeController _themeController = Get.find();
@@ -31,12 +28,11 @@ class CustomeCircleAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    File? imageFile = _chatListController.imageFile;
     return Stack(
       fit: StackFit.passthrough,
       alignment: Alignment.center,
       children: [
-        hasDay
+        user.hasDay!
             ? Container(
                 width: customWidth(.16),
                 height: customWidth(.16),
@@ -56,19 +52,16 @@ class CustomeCircleAvatar extends StatelessWidget {
                     ),
                   ),
                   child: CircleAvatar(
-                    backgroundImage: imageFile == null
-                        ? AssetImage(imageUrl)
-                        : FileImage(_chatListController.imageFile!)
-                            as ImageProvider,
+                    backgroundImage: FileImage(File(user.imageUrl!)),
                     radius: picRadius ?? customWidth(.05),
                   ),
                 ),
               )
             : CircleAvatar(
-                backgroundImage: AssetImage(imageUrl),
+                backgroundImage: FileImage(File(user.imageUrl!)),
                 radius: picRadius ?? customWidth(.08),
               ),
-        isOnline == true && isBlock == false
+        user.isOnline == true && user.isBlock == false
             ? Positioned(
                 right: 0,
                 bottom: 0,

@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ChatListController extends FriendListController {
-  final List<ChatListModel> _chatlist = [];
+  final List<ChatListModel> chatlist = [];
 
   // List<ChatListModel> get chatlist {
   //   return demoChatList;
@@ -39,36 +39,36 @@ class ChatListController extends FriendListController {
   var isUserBlocked = false.obs;
   File? imageFile;
 
-  void addNewChat(
-      {required String name,
-      required String imageUrl,
-      required String msg,
-      required String lastOnlineTime,
-      required bool isOnline,
-      required bool hasDay,
-      required bool isBlock}) {
-    demoUsers.add(FriendListModel(
-        name: name,
-        imageUrl: imageUrl,
-        lastMessageTime: DateTime.now(),
-        lastMessage: msg,
-        inactiveTime: "inactiveTime"));
-    // demoChatList.add(
-    //   ChatListModel(
-    //     friendListID: 3,
-    //     sendMessage: msg,
-    //     memberID: 2,
-    //     receiveMessage: "",
-    //     senderTime: DateTime.now(),
-    //     receiveTime: DateTime.now(),
-    //     isReceived: "not received",
-    //   ),
-    // );
-    // DatabaseController.insertUser(FriendListModel(
-    //     name: name,
-    //     imageUrl: imageUrl,
-    //     lastMessageTime: DateTime.now(),
-    //     lastMessage: msg,
-    //     inactiveTime: "inactiveTime"));
-  }
+  // void addNewChat(
+  //     {required String name,
+  //     required String imageUrl,
+  //     required String msg,
+  //     required String lastOnlineTime,
+  //     required bool isOnline,
+  //     required bool hasDay,
+  //     required bool isBlock}) {
+  // demoUsers.add(FriendListModel(
+  //     name: name,
+  //     imageUrl: imageUrl,
+  //     lastMessageTime: DateTime.now(),
+  //     lastMessage: msg,
+  //     inactiveTime: "inactiveTime"));
+  // demoChatList.add(
+  //   ChatListModel(
+  //     friendListID: 3,
+  //     sendMessage: msg,
+  //     memberID: 2,
+  //     receiveMessage: "",
+  //     senderTime: DateTime.now(),
+  //     receiveTime: DateTime.now(),
+  //     isReceived: "not received",
+  //   ),
+  // );
+  // DatabaseController.insertUser(FriendListModel(
+  //     name: name,
+  //     imageUrl: imageUrl,
+  //     lastMessageTime: DateTime.now(),
+  //     lastMessage: msg,
+  //     inactiveTime: "inactiveTime"));
+  // }
 }

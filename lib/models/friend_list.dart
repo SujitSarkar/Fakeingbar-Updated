@@ -67,7 +67,7 @@ class FriendListModel {
     isOnline = map['isOnline'] == 1;
     isBlock = map['isBlock'] == 1;
     hasDay = map['hasDay'] == 1;
-    chatColor = map['chatColor'] as int;
+    chatColor = int.parse(map['chatColor']);
     welcomeMessage = map['welcomeMessage'];
     address = map['address'];
     hasGroup = map['hasGroup'] == 1;

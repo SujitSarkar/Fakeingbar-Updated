@@ -73,6 +73,7 @@ class DatabaseController extends GetxController {
   void onInit() {
     super.onInit();
     getUserList();
+    getChatList();
   }
 
   ///Fetch "Friendlist" as Map list from DB
@@ -89,6 +90,7 @@ class DatabaseController extends GetxController {
     var userMapList = await getUserMapList();
 
     for (var userMap in userMapList) {
+      print(userMap);
       userList.add(FriendListModel.fromMapObject(userMap));
     }
     update();
@@ -109,9 +111,11 @@ class DatabaseController extends GetxController {
 
   ///Insert FriendList
   Future<int> insertUser(FriendListModel user) async {
+    print(user);
     Database db = await database;
     var result = await db.insert(KStrings.tableFriendList, user.toMap());
     await getUserList();
+    print("User Added...........$result");
     return result;
   }
 
@@ -151,6 +155,7 @@ class DatabaseController extends GetxController {
     var chatMapList = await getChatMapList();
 
     for (var chatMap in chatMapList) {
+      print(chatMap);
       chatList.add(ChatListModel.fromMapObject(chatMap));
     }
     update();
@@ -171,9 +176,11 @@ class DatabaseController extends GetxController {
 
   ///Insert Chat
   Future<int> insertChat(ChatListModel chat) async {
+    print(chat);
     Database db = await database;
     var result = await db.insert(KStrings.tableChatList, chat.toMap());
     await getChatList();
+    print("Chat addeed........$result");
     return result;
   }
 

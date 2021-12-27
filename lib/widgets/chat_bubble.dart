@@ -66,9 +66,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                   child: CustomeCircleAvatar(
                     onlineDotSize: customWidth(.032),
                     borderWidth: 2,
-                    isOnline: widget.user.isOnline!,
-                    hasDay: widget.user.hasDay!,
-                    imageUrl: widget.user.imageUrl!,
+                  user: widget.user,
                   ),
                 ),
                 const SizedBox(width: 15.0),

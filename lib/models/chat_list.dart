@@ -37,7 +37,7 @@ class ChatListModel {
   //Extract a note object from a map object
   ChatListModel.fromMapObject(Map<String, dynamic> map) {
     id = map['id'];
-    friendListID = map['friendListID'];
+    friendListID = int.parse(map['friendListID']);
     sendMessage = map['sendMessage'];
     memberID = map['memberID'];
     receiveMessage = map['receiveMessage'];

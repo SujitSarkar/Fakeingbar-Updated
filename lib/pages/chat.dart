@@ -76,9 +76,7 @@ class _ChatState extends State<Chat> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             CustomeCircleAvatar(
-              hasDay: false,
-              imageUrl: widget.user.imageUrl!,
-              isOnline: false,
+              user: widget.user,
               picRadius: 50,
             ),
             SizedBox(

@@ -9,7 +9,6 @@ import 'package:fakeingbar/pages/chat_settings_page.dart';
 import 'package:fakeingbar/pages/date_time_page.dart';
 import 'package:fakeingbar/pages/video_call.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -97,10 +96,7 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                 height: customWidth(.11),
                 width: customWidth(.11),
                 child: CustomeCircleAvatar(
-                  isBlock: _chatListController.isUserBlocked.value,
-                  hasDay: widget.user.hasDay!,
-                  imageUrl: widget.user.imageUrl!,
-                  isOnline: widget.user.isOnline!,
+                  user: widget.user,
                 ),
               ),
               SizedBox(
@@ -232,49 +228,6 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
     );
   }
 
-  // _showPopupMenu(Offset offset) async {
-  //   RenderBox? overlay =
-  //       Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
-
-  //   double left = offset.dx;
-  //   double top = offset.dy;
-  //   await showMenu(
-  //     context: context,
-  //     position: RelativeRect.fromLTRB(
-  //       left,
-  //       top,
-  //       overlay!.size.width - left,
-  //       overlay.size.height - top,
-  //     ),
-  //     items: [
-  //       // ...List.generate(
-  //       //     5,
-  //       //     (index) => PopupMenuItem(
-  //       //           child: Text(menuItems[index]),
-  //       //           value: index,
-  //       //           onTap: () => print(index),
-  //       //         ))
-  //       PopupMenuItem(
-  //         child: Text(chatSetting[0]),
-  //         onTap: () => _menuIndexedFunction(0),
-  //       ),
-  //       PopupMenuItem(
-  //         child: Text(chatSetting[1]),
-  //         onTap: () => _menuIndexedFunction(1),
-  //       ),
-  //       PopupMenuItem(
-  //         child: Text(chatSetting[2]),
-  //         onTap: () => _menuIndexedFunction(2),
-  //       ),
-  //       PopupMenuItem(
-  //         child: Text(chatSetting[3]),
-  //         onTap: () => _menuIndexedFunction(3),
-  //       ),
-  //     ],
-  //     elevation: 8.0,
-  //   );
-  // }
-
   _menuIndexedFunction(int item) {
     switch (item) {
       case 0:
@@ -286,36 +239,30 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
         print("$item Set Profile Picture............");
         break;
       case 2:
-        _getToDateTimePage();
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => DateTimePage()));
         print("$item Add Date/Time..............");
         break;
       case 3:
-        _getToChatSettingsPage();
+        Get.to(() => ChatSettingsPage(
+              user: widget.user,
+            ));
         print("$item Chat Settings...............");
         break;
       default:
     }
   }
 
-  _getToDateTimePage() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => DateTimePage()));
-  }
-
-  _getToChatSettingsPage() {
-    Get.to(() => ChatSettingsPage(
-          user: widget.user,
-        ));
-  }
-
   _takeProfilePic() async {
-    ImagePicker _picker = ImagePicker();
-    await _picker.pickImage(source: ImageSource.gallery).then((xFile) {
-      if (xFile != null) {
-        setState(() {
-          _chatListController.imageFile = File(xFile.path);
-        });
-        _themeController.pref!.setString("profilePicPath", xFile.path);
-      }
-    });
+    final ImagePicker _picker = ImagePicker();
+    // Pick an image
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        _chatListController.imageFile = File(image.path);
+        _themeController.pref!.setString("profilePicPath", image.path);
+      });
+    }
   }
 }
