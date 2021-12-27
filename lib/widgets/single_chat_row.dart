@@ -12,7 +12,7 @@ import 'custom_circle_avatar.dart';
 class SingleChatRow extends StatefulWidget {
   const SingleChatRow({Key? key, required this.user}) : super(key: key);
 
-  final FriendList user;
+  final FriendListModel user;
 
   @override
   _SingleChatRowState createState() => _SingleChatRowState();
@@ -62,9 +62,7 @@ class _SingleChatRowState extends State<SingleChatRow> {
           child: Row(
             children: <Widget>[
               CustomeCircleAvatar(
-                hasDay: widget.user.hasDay,
-                imageUrl: widget.user.imageUrl,
-                isOnline: widget.user.isOnline,
+                user: widget.user,
               ),
               SizedBox(
                 width: 10.0,
@@ -73,7 +71,7 @@ class _SingleChatRowState extends State<SingleChatRow> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    widget.user.name,
+                    widget.user.name!,
                     style: TextStyle(
                       fontSize: 16.0,
                       color: _themeController.darkenTextColor,
@@ -86,8 +84,11 @@ class _SingleChatRowState extends State<SingleChatRow> {
                   Row(
                     children: <Widget>[
                       Text(
-                        widget.user.lastMessage,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                        widget.user.lastMessage!,
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: _themeController.darkenTextColor,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(
@@ -101,7 +102,7 @@ class _SingleChatRowState extends State<SingleChatRow> {
                         width: customWidth(.01),
                       ),
                       Text(
-                        widget.user.inactiveTime,
+                        widget.user.inactiveTime!,
                         style: TextStyle(fontSize: 14.0, color: Colors.grey),
                       ),
                     ],
@@ -132,9 +133,7 @@ class _SingleChatRowState extends State<SingleChatRow> {
                                   width: customWidth(.05),
                                   height: customWidth(.05),
                                   child: CustomeCircleAvatar(
-                                    imageUrl: widget.user.imageUrl,
-                                    hasDay: false,
-                                    isOnline: false,
+                                    user: widget.user,
                                   ),
                                 )
                               : SizedBox()

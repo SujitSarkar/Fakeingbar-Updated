@@ -1,11 +1,8 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/chat_list.dart';
 import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/user.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../config.dart';
@@ -18,8 +15,8 @@ class ChatBubble extends StatefulWidget {
     required this.user,
   }) : super(key: key);
 
-  final ChatList chatList;
-  final FriendList user;
+  final ChatListModel chatList;
+  final FriendListModel user;
 
   @override
   State<ChatBubble> createState() => _ChatBubbleState();
@@ -69,9 +66,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                   child: CustomeCircleAvatar(
                     onlineDotSize: customWidth(.032),
                     borderWidth: 2,
-                    isOnline: widget.user.isOnline,
-                    hasDay: widget.user.hasDay,
-                    imageUrl: widget.user.imageUrl,
+                  user: widget.user,
                   ),
                 ),
                 const SizedBox(width: 15.0),
@@ -88,7 +83,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                   child: Container(
                     constraints: BoxConstraints(maxWidth: customWidth(.5)),
                     child: Text(
-                      widget.chatList.receiveMessage,
+                      widget.chatList.receiveMessage!,
                       softWrap: true,
                       overflow: TextOverflow.visible,
                       textWidthBasis: TextWidthBasis.longestLine,
@@ -130,7 +125,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                   child: Container(
                     constraints: BoxConstraints(maxWidth: customWidth(.5)),
                     child: Text(
-                      widget.chatList.sendMessage,
+                      widget.chatList.sendMessage!,
                       textWidthBasis: TextWidthBasis.longestLine,
                       style: TextStyle(
                         fontSize: 15.0,

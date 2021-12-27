@@ -5,7 +5,6 @@ import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/chat_list.dart';
 import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
@@ -25,7 +24,7 @@ import 'package:get/get.dart';
 // ];
 
 class Chat extends StatefulWidget {
-  final FriendList user;
+  final FriendListModel user;
   const Chat({Key? key, required this.user}) : super(key: key);
 
   @override
@@ -38,7 +37,7 @@ class _ChatState extends State<Chat> {
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
 
-  List<ChatList> _chatList = [];
+  List<ChatListModel> _chatList = [];
   List<String> chatSetting = [];
 
   final _textBox = "".obs;
@@ -77,16 +76,14 @@ class _ChatState extends State<Chat> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             CustomeCircleAvatar(
-              hasDay: false,
-              imageUrl: widget.user.imageUrl,
-              isOnline: false,
+              user: widget.user,
               picRadius: 50,
             ),
             SizedBox(
               height: customWidth(.03),
             ),
             Text(
-              widget.user.name,
+              widget.user.name!,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: customWidth(.065),
@@ -97,7 +94,7 @@ class _ChatState extends State<Chat> {
               height: customWidth(.015),
             ),
             Text(
-              widget.user.welcomeMessage,
+              widget.user.welcomeMessage!,
               style: TextStyle(
                 color: _themeController.textColor,
               ),
@@ -139,9 +136,9 @@ class _ChatState extends State<Chat> {
     return ChatAppBarAction(
       isScroll: _isScroll,
       isBack: true,
-      isOnline: widget.user.isOnline,
-      title: widget.user.name, //widget.friendItem!.name,
-      imageUrl: widget.user.imageUrl, //widget.friendItem!.imageAvatarUrl,
+      isOnline: widget.user.isOnline!,
+      title: widget.user.name!, //widget.friendItem!.name,
+      imageUrl: widget.user.imageUrl!, //widget.friendItem!.imageAvatarUrl,
       subTitle: widget.user.isOnline == true
           ? 'Active now'
           : "Active ${widget.user.inactiveTime}",

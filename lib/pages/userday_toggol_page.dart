@@ -1,7 +1,7 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/controller/user_controller.dart';
+import 'package:fakeingbar/controller/friendList_controller.dart';
+import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,16 +17,17 @@ class UserDayToggolPage extends StatefulWidget {
 
 class _UserDayToggolPageState extends State<UserDayToggolPage> {
   final ThemeController _themeController = Get.find();
-  final UserController _userController = Get.find();
+  final FriendListController _userController = Get.find();
+  final DatabaseController _databaseController = Get.find();
 
-  final List<FriendList> _users = [];
+  final List<FriendListModel> _users = [];
   final List<bool> _dayUser = [];
 
   @override
   void initState() {
     super.initState();
-    _users.addAll(_userController.users);
-    _dayUser.addAll(_users.map((e) => e.hasDay).toList());
+    _users.addAll(_databaseController.userList);
+    _dayUser.addAll(_users.map((e) => e.hasDay!));
   }
 
   @override
@@ -59,15 +60,13 @@ class _UserDayToggolPageState extends State<UserDayToggolPage> {
                 child: Row(
                   children: [
                     CustomeCircleAvatar(
-                      hasDay: _users[index].hasDay,
-                      imageUrl: _users[index].imageUrl,
-                      isOnline: _users[index].isOnline,
+                      user: _users[index],
                     ),
                     SizedBox(
                       width: customWidth(.02),
                     ),
                     Text(
-                      _users[index].name,
+                      _users[index].name!,
                       style: TextStyle(
                         color: _themeController.textColor,
                         fontSize: 16.0,
@@ -78,7 +77,7 @@ class _UserDayToggolPageState extends State<UserDayToggolPage> {
                     Switch(
                       value: _dayUser[index],
                       onChanged: (value) {
-                        _userController.changeUserDay(_users[index]);
+                        // _userController.changeUserDay(_users[index]);
                         _dayUser[index] = !_dayUser[index];
                       },
                     )

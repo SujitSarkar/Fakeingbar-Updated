@@ -1,23 +1,22 @@
 import 'package:flutter/cupertino.dart';
 
-class FriendList {
-  final int id;
-  final String name;
-  final String imageUrl;
-  final DateTime lastMessageTime;
-  final String messageStatus;
-  final bool isOnline;
-  final bool isBlock;
-  final String lastMessage;
-  bool hasDay;
-  final int chatColor;
-  final String inactiveTime;
-  final String welcomeMessage;
-  final String address;
-  final bool hasGroup;
+class FriendListModel {
+  int? id;
+  String? name;
+  String? imageUrl;
+  DateTime? lastMessageTime;
+  String? messageStatus;
+  bool? isOnline;
+  bool? isBlock;
+  String? lastMessage;
+  bool? hasDay;
+  int? chatColor;
+  String? inactiveTime;
+  String? welcomeMessage;
+  String? address;
+  bool? hasGroup;
 
-  FriendList({
-    required this.id,
+  FriendListModel({
     required this.name,
     required this.imageUrl,
     required this.lastMessageTime,
@@ -32,55 +31,93 @@ class FriendList {
     this.address = "Lives in UK",
     this.hasGroup = false,
   });
+
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{};
+
+    if (id != null) {
+      map['id'] = id;
+    }
+    map['name'] = name;
+    map['imageUrl'] = imageUrl;
+    map['lastMessageTime'] = lastMessageTime!.millisecondsSinceEpoch.toString();
+    map['lastMessage'] = lastMessage;
+    map['inactiveTime'] = inactiveTime;
+    map['messageStatus'] = messageStatus;
+    map['isOnline'] = isOnline! ? 1 : 0;
+    map['isBlock'] = isBlock! ? 1 : 0;
+    map['hasDay'] = hasDay! ? 1 : 0;
+    map['chatColor'] = chatColor;
+    map['welcomeMessage'] = welcomeMessage;
+    map['address'] = address;
+    map['hasGroup'] = hasGroup! ? 1 : 0;
+    return map;
+  }
+
+  //Extract a note object from a map object
+  FriendListModel.fromMapObject(Map<String, dynamic> map) {
+    id = map['id'];
+    name = map['name'];
+    imageUrl = map['imageUrl'];
+    lastMessageTime = DateTime.fromMillisecondsSinceEpoch(
+        (int.parse((map['lastMessageTime']))));
+    lastMessage = map['lastMessage'];
+    inactiveTime = map['inactiveTime'];
+    messageStatus = map['messageStatus'];
+    isOnline = map['isOnline'] == 1;
+    isBlock = map['isBlock'] == 1;
+    hasDay = map['hasDay'] == 1;
+    chatColor = int.parse(map['chatColor']);
+    welcomeMessage = map['welcomeMessage'];
+    address = map['address'];
+    hasGroup = map['hasGroup'] == 1;
+  }
 }
 
-List<FriendList> friendList = [
-  FriendList(
-    id: 1,
-    name: "Evan",
-    imageUrl: "images/w2.jpg",
-    lastMessageTime: DateTime.now(),
-    messageStatus: "not received",
-    isOnline: true,
-    isBlock: false,
-    lastMessage: "lastMessage",
-    hasDay: true,
-    chatColor: 1,
-    inactiveTime: "Active",
-    welcomeMessage: "welcomeMessage",
-    address: "address",
-    hasGroup: false,
-  ),
-  FriendList(
-    id: 2,
-    name: "Ankur",
-    imageUrl: "images/m2.jpg",
-    lastMessageTime: DateTime.now(),
-    messageStatus: "not received",
-    isOnline: true,
-    isBlock: false,
-    lastMessage: "Lets meet tomorrow",
-    hasDay: true,
-    chatColor: 1,
-    inactiveTime: "Active",
-    welcomeMessage: "welcomeMessage",
-    address: "address",
-    hasGroup: false,
-  ),
-  FriendList(
-    id: 3,
-    name: "Stella",
-    imageUrl: "images/w2.jpg",
-    lastMessageTime: DateTime.now(),
-    messageStatus: "not received",
-    isOnline: true,
-    isBlock: false,
-    lastMessage: "Hey What's up?",
-    hasDay: true,
-    chatColor: 1,
-    inactiveTime: "Active",
-    welcomeMessage: "welcomeMessage",
-    address: "address",
-    hasGroup: false,
-  )
-];
+// List<FriendListModel> friendList = [
+//   FriendListModel(
+//     name: "Evan",
+//     imageUrl: "images/w2.jpg",
+//     lastMessageTime: DateTime.now(),
+//     messageStatus: "not received",
+//     isOnline: true,
+//     isBlock: false,
+//     lastMessage: "lastMessage",
+//     hasDay: true,
+//     chatColor: 1,
+//     inactiveTime: "Active",
+//     welcomeMessage: "welcomeMessage",
+//     address: "address",
+//     hasGroup: false,
+//   ),
+//   FriendListModel(
+//     name: "Ankur",
+//     imageUrl: "images/m2.jpg",
+//     lastMessageTime: DateTime.now(),
+//     messageStatus: "not received",
+//     isOnline: true,
+//     isBlock: false,
+//     lastMessage: "Lets meet tomorrow",
+//     hasDay: true,
+//     chatColor: 1,
+//     inactiveTime: "Active",
+//     welcomeMessage: "welcomeMessage",
+//     address: "address",
+//     hasGroup: false,
+//   ),
+//   FriendListModel(
+//     name: "Stella",
+//     imageUrl: "images/w2.jpg",
+//     lastMessageTime: DateTime.now(),
+//     messageStatus: "not received",
+//     isOnline: true,
+//     isBlock: false,
+//     lastMessage: "Hey What's up?",
+//     hasDay: true,
+//     chatColor: 1,
+//     inactiveTime: "Active",
+//     welcomeMessage: "welcomeMessage",
+//     address: "address",
+//     hasGroup: false,
+//   )
+// ];

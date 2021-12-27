@@ -1,6 +1,5 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/user.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +8,7 @@ import '../config.dart';
 
 class ChatSettingsPage extends StatefulWidget {
   ChatSettingsPage({Key? key, required this.user}) : super(key: key);
-  final FriendList user;
+  final FriendListModel user;
 
   @override
   State<ChatSettingsPage> createState() => _ChatSettingsPageState();
@@ -40,7 +39,7 @@ class _ChatSettingsPageState extends State<ChatSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    _nameController.text = widget.user.name;
+    _nameController.text = widget.user.name!;
     _activeController.text =
         _radioSelected == 1 ? "Active Now" : "Active 2 hours ago";
     return Scaffold(

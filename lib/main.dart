@@ -1,6 +1,7 @@
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/controller/user_controller.dart';
+import 'package:fakeingbar/controller/friendList_controller.dart';
+import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/pages/home_page.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +23,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeController _themeController = Get.put(ThemeController());
-    UserController _userController = Get.put(UserController());
+    FriendListController _friendListController =
+        Get.put(FriendListController());
     ChatListController _chatController = Get.put(ChatListController());
+    DatabaseController _databaeController = Get.put(DatabaseController());
     return GetBuilder<ThemeController>(builder: (controller) {
       return GetMaterialApp(
         title: 'FakingBar',
