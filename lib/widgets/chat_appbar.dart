@@ -3,11 +3,12 @@ import 'dart:io';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/models/friend_list.dart';
+import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/pages/audio_call_page.dart';
 import 'package:fakeingbar/pages/chat_settings_page.dart';
 import 'package:fakeingbar/pages/date_time_page.dart';
 import 'package:fakeingbar/pages/video_call.dart';
+import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -82,10 +83,10 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                   onTap: () {
                     Navigator.pop(context); //Routes.goBack(context);
                   },
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back,
                     size: 25.0,
-                    color: Colors.deepPurpleAccent,
+                    color: SThemeData.chatColors[widget.user.chatColor!],
                   ),
                 ),
               ),
@@ -145,9 +146,10 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                                     image: widget.user.imageUrl,
                                   ));
                             },
-                            child: const Icon(
+                            child: Icon(
                               FontAwesomeIcons.phoneAlt,
-                              color: Colors.deepPurpleAccent,
+                              color:
+                                  SThemeData.chatColors[widget.user.chatColor!],
                               size: 20.0,
                             ),
                           )
@@ -166,9 +168,10 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                                         image: widget.user.imageUrl,
                                       ));
                                 },
-                                child: const Icon(
+                                child: Icon(
                                   FontAwesomeIcons.video,
-                                  color: Colors.deepPurpleAccent,
+                                  color: SThemeData
+                                      .chatColors[widget.user.chatColor!],
                                   size: 20.0,
                                 ),
                               ),
@@ -215,9 +218,9 @@ class _ChatAppBarActionState extends State<ChatAppBarAction> {
                     onSelected: (value) {
                       _menuIndexedFunction(value);
                     },
-                    child: const Icon(
+                    child: Icon(
                       Icons.info_rounded,
-                      color: Colors.deepPurpleAccent,
+                      color: SThemeData.chatColors[widget.user.chatColor!],
                       size: 25.0,
                     ),
                   ),

@@ -7,6 +7,10 @@ class SThemeData {
   static Color blackColor = Colors.black;
   static Color textColor = const Color(0xff787878);
 
+  static const Color lightThemeColor = Color(0xff009AFE);
+  static const Color darkThemeColor = Color(0xff000100);
+  static const Color blueDotColor = Color(0xff429AFE);
+
   static final ThemeData lightThemeData = ThemeData(
     backgroundColor: Colors.white,
     brightness: Brightness.light,
@@ -131,6 +135,21 @@ class SThemeData {
     900: Color.fromRGBO(0, 1, 0, 1),
   };
 
-  static const Color lightThemeColor = Color(0xff009AFE);
-  static const Color darkThemeColor = Color(0xff000100);
+  static const List<Color> chatColors = [
+    Colors.blue,
+    Colors.orangeAccent,
+    Colors.redAccent,
+    Color(0xffD696BB),
+    Color(0xff669ACC),
+    Color(0xff12CF13),
+    Colors.deepOrangeAccent,
+    Color(0xffE58586),
+    Color(0xff7646FE),
+    Color(0xff20CDF5),
+    Color(0xff67B869),
+    Color(0xffD4A88D),
+    Colors.pinkAccent,
+    Colors.purpleAccent,
+    Color(0xffA696C7),
+  ];
 }

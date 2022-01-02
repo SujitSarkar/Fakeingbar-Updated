@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
-import 'package:fakeingbar/models/chat_list.dart';
-import 'package:fakeingbar/models/friend_list.dart';
+import 'package:fakeingbar/models/chat_list_model.dart';
+import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 

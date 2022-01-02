@@ -26,7 +26,7 @@ class GroupUserListModel {
   //Extract a note object from a map object
   GroupUserListModel.fromMapObject(Map<String, dynamic> map) {
     id = map['id'];
-    friendListID = map['friendListID'];
+    friendListID = int.parse(map['friendListID']);
     name = map['name'];
     imageUrl = map['imageUrl'];
   }

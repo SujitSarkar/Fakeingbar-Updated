@@ -1,5 +1,6 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/models/friend_list.dart';
+import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
+import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/pages/chat.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/gestures.dart';
@@ -20,7 +21,7 @@ class SingleChatRow extends StatefulWidget {
 
 class _SingleChatRowState extends State<SingleChatRow> {
   final ThemeController _themeController = Get.find();
-  LongPressDownDetails _pressDetails = LongPressDownDetails();
+  LongPressDownDetails _pressDetails = const LongPressDownDetails();
 
   List<String> menuItems = [];
   @override
@@ -37,114 +38,119 @@ class _SingleChatRowState extends State<SingleChatRow> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: customWidth(.05),
-        right: customWidth(.05),
-        bottom: customWidth(0.05),
-      ),
-      child: GestureDetector(
-        onTap: () {
-          Get.to(() => Chat(
-                user: widget.user,
-              ));
-        },
-        onLongPressDown: (pressDetails) {
-          setState(() {
-            _pressDetails = pressDetails;
-          });
-        },
-        onLongPress: () {
-          _showPopupMenu(_pressDetails.globalPosition);
-        },
-        child: Container(
-          decoration: const BoxDecoration(shape: BoxShape.circle),
-          child: Row(
-            children: <Widget>[
-              CustomeCircleAvatar(
-                user: widget.user,
-              ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    widget.user.name!,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: _themeController.darkenTextColor,
-                      fontWeight: FontWeight.w400,
+    return GetBuilder<DatabaseController>(builder: (_databaseController) {
+      return Padding(
+        padding: EdgeInsets.only(
+          left: customWidth(.05),
+          right: customWidth(.05),
+          bottom: customWidth(0.05),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            Get.to(() => Chat(
+                  user: widget.user,
+                ));
+          },
+          onLongPressDown: (pressDetails) {
+            setState(() {
+              _pressDetails = pressDetails;
+            });
+          },
+          onLongPress: () {
+            _showPopupMenu(_pressDetails.globalPosition, _databaseController);
+          },
+          child: Container(
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            child: Row(
+              children: <Widget>[
+                CustomeCircleAvatar(
+                  user: widget.user,
+                ),
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      widget.user.name!,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: _themeController.darkenTextColor,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    width: customWidth(.02),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        widget.user.lastMessage!,
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          color: _themeController.darkenTextColor,
+                    SizedBox(
+                      width: customWidth(.02),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          widget.user.lastMessage!,
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: _themeController.darkenTextColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(
-                        width: customWidth(.01),
-                      ),
-                      const Text(
-                        "\u00B7",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        width: customWidth(.01),
-                      ),
-                      Text(
-                        widget.user.inactiveTime!,
-                        style: TextStyle(fontSize: 14.0, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Spacer(),
-              widget.user.messageStatus == "not send"
-                  ? Icon(
-                      Icons.circle,
-                      color: SThemeData.lightThemeColor,
-                      size: customWidth(.05),
-                    )
-                  : widget.user.messageStatus == "not received"
-                      ? Icon(
-                          Icons.check_circle_outline,
-                          color: _themeController.darkenTextColor,
-                          size: customWidth(.05),
-                        )
-                      : widget.user.messageStatus == "received"
-                          ? Icon(
-                              Icons.check_circle,
-                              color: _themeController.darkenTextColor,
-                              size: customWidth(.05),
-                            )
-                          : widget.user.messageStatus == "seen"
-                              ? SizedBox(
-                                  width: customWidth(.05),
-                                  height: customWidth(.05),
-                                  child: CustomeCircleAvatar(
-                                    user: widget.user,
-                                  ),
-                                )
-                              : SizedBox()
-            ],
+                        SizedBox(
+                          width: customWidth(.01),
+                        ),
+                        const Text(
+                          "\u00B7",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          width: customWidth(.01),
+                        ),
+                        Text(
+                          widget.user.inactiveTime!,
+                          style: const TextStyle(
+                              fontSize: 14.0, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                widget.user.messageStatus == "not send"
+                    ? Icon(
+                        Icons.circle,
+                        color: SThemeData.lightThemeColor,
+                        size: customWidth(.05),
+                      )
+                    : widget.user.messageStatus == "not received"
+                        ? Icon(
+                            Icons.check_circle_outline,
+                            color: _themeController.darkenTextColor,
+                            size: customWidth(.05),
+                          )
+                        : widget.user.messageStatus == "received"
+                            ? Icon(
+                                Icons.check_circle,
+                                color: _themeController.darkenTextColor,
+                                size: customWidth(.05),
+                              )
+                            : widget.user.messageStatus == "seen"
+                                ? SizedBox(
+                                    width: customWidth(.04),
+                                    height: customWidth(.04),
+                                    child: CustomeCircleAvatar(
+                                      user: widget.user,
+                                      onlineDotSize: 0,
+                                      showDay: false,
+                                    ),
+                                  )
+                                : const SizedBox()
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
-  _showPopupMenu(Offset offset) async {
+  _showPopupMenu(Offset offset, DatabaseController _databaseController) async {
     RenderBox? overlay =
         Overlay.of(context)!.context.findRenderObject()! as RenderBox?;
     double left = offset.dx;
@@ -167,44 +173,54 @@ class _SingleChatRowState extends State<SingleChatRow> {
         //         ))
         PopupMenuItem(
           child: Text(menuItems[0]),
-          onTap: () => _menuIndexedFunction(0),
+          onTap: () => _menuIndexedFunction(0, _databaseController),
         ),
         PopupMenuItem(
           child: Text(menuItems[1]),
-          onTap: () => _menuIndexedFunction(1),
+          onTap: () => _menuIndexedFunction(1, _databaseController),
         ),
         PopupMenuItem(
           child: Text(menuItems[2]),
-          onTap: () => _menuIndexedFunction(2),
+          onTap: () => _menuIndexedFunction(2, _databaseController),
         ),
         PopupMenuItem(
           child: Text(menuItems[3]),
-          onTap: () => _menuIndexedFunction(3),
+          onTap: () => _menuIndexedFunction(3, _databaseController),
         ),
         PopupMenuItem(
           child: Text(menuItems[4]),
-          onTap: () => _menuIndexedFunction(4),
+          onTap: () => _menuIndexedFunction(4, _databaseController),
         ),
       ],
       elevation: 8.0,
     );
   }
 
-  _menuIndexedFunction(int item) {
+  _menuIndexedFunction(int item, DatabaseController _databaseController) {
     switch (item) {
       case 0:
+        _databaseController.deleteUser(widget.user.id!);
         print("$item Delete.............");
         break;
       case 1:
+        _databaseController.updateUser(
+            widget.user.copyWith(messageStatus: "seen"), widget.user.id!);
         print("$item Set Seen............");
         break;
       case 2:
+        _databaseController.updateUser(
+            widget.user.copyWith(messageStatus: "received"), widget.user.id!);
         print("$item Set Received..............");
         break;
       case 3:
+        _databaseController.updateUser(
+            widget.user.copyWith(messageStatus: "not received"),
+            widget.user.id!);
         print("$item Not Received...............");
         break;
       case 4:
+        _databaseController.updateUser(
+            widget.user.copyWith(messageStatus: "not send"), widget.user.id!);
         print("$item Not Send...............");
         break;
       default:
