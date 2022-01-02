@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:fakeingbar/data/local_database.dart/string.dart';
-import 'package:fakeingbar/models/chat_list.dart';
-import 'package:fakeingbar/models/friend_list.dart';
-import 'package:fakeingbar/models/gruop_user_list.dart';
+import 'package:fakeingbar/models/chat_list_model.dart';
+import 'package:fakeingbar/models/friend_list_model.dart';
+import 'package:fakeingbar/models/gruop_user_list_model.dart';
 import 'package:fakeingbar/models/trainer_chat_model.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,38 +29,41 @@ class DatabaseController extends GetxController {
 
   void _createDB(Database db, int version) async {
     await db.execute(
-        'CREATE TABLE ${KStrings.tableFriendList}(${KStrings.colFkChatListFriendId} INTEGER PRIMARY KEY AUTOINCREMENT, '
+        'CREATE TABLE ${KStrings.tableFriendList}(${KStrings.colFriendListId} INTEGER PRIMARY KEY AUTOINCREMENT, '
         '${KStrings.colFriendListName} TEXT, ${KStrings.colFriendListImageUrl} TEXT, '
         '${KStrings.colLastMessageTime} TEXT, ${KStrings.colLastMessage} TEXT, '
         '${KStrings.colMessageStatus} TEXT, ${KStrings.colIsOnline} TEXT, '
         '${KStrings.colIsBlock} TEXT, ${KStrings.colHasDay} TEXT, '
         '${KStrings.colChatColor} TEXT, ${KStrings.colInactiveTime} TEXT, '
         '${KStrings.colWelcomeMessage} TEXT, ${KStrings.colAddress} TEXT, '
-        '${KStrings.colHasGroup} TEXT');
+        '${KStrings.colHasGroup} TEXT)');
 
     await db.execute(
         'CREATE TABLE ${KStrings.tableChatList}(${KStrings.colChatListId} INTEGER PRIMARY KEY AUTOINCREMENT, '
         '${KStrings.colMemberID} TEXT, ${KStrings.colFkChatListFriendId} TEXT, '
         '${KStrings.colSendMessage} TEXT, ${KStrings.colReceiveMessage} TEXT, '
         '${KStrings.colSenderTime} TEXT, ${KStrings.colReceiveTime} TEXT, '
-        '${KStrings.colIsReceived} TEXT');
+        '${KStrings.colIsReceived} TEXT)');
 
     await db.execute(
         'CREATE TABLE ${KStrings.tableGroupList}(${KStrings.colGroupListId} INTEGER PRIMARY KEY AUTOINCREMENT, '
         '${KStrings.colGroupMemberName} TEXT, ${KStrings.colFkGroupFriendID} TEXT, '
-        '${KStrings.colGroupMemberImageUrl} TEXT');
+        '${KStrings.colGroupMemberImageUrl} TEXT)');
 
     await db.execute(
         'CREATE TABLE ${KStrings.tableTrainer}(${KStrings.colTrainerId} INTEGER PRIMARY KEY AUTOINCREMENT, '
-        '${KStrings.colQuestion} TEXT, ${KStrings.colAnswer} TEXT');
+        '${KStrings.colQuestion} TEXT, ${KStrings.colAnswer} TEXT)');
   }
 
   Future<Database> initializeDatabase() async {
     ///Get the directory path for both android and iOS
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path + _databaseName;
-    var addressDatabase =
-        await openDatabase(path, version: 1, onCreate: _createDB);
+    var addressDatabase = await openDatabase(
+      path,
+      version: _databaseVersion,
+      onCreate: _createDB,
+    );
     return addressDatabase;
   }
 
@@ -74,6 +77,7 @@ class DatabaseController extends GetxController {
     super.onInit();
     getUserList();
     getChatList();
+    getGroupUserList();
   }
 
   ///Fetch "Friendlist" as Map list from DB
@@ -90,7 +94,7 @@ class DatabaseController extends GetxController {
     var userMapList = await getUserMapList();
 
     for (var userMap in userMapList) {
-      print(userMap);
+      print("User...: $userMap");
       userList.add(FriendListModel.fromMapObject(userMap));
     }
     update();
@@ -106,6 +110,7 @@ class DatabaseController extends GetxController {
       whereArgs: [id.toString()],
     );
     await getUserList();
+    update();
     return result;
   }
 
@@ -116,6 +121,7 @@ class DatabaseController extends GetxController {
     var result = await db.insert(KStrings.tableFriendList, user.toMap());
     await getUserList();
     print("User Added...........$result");
+    update();
     return result;
   }
 
@@ -138,6 +144,7 @@ class DatabaseController extends GetxController {
       whereArgs: [id.toString()],
     );
     await getUserList();
+    update();
     return result;
   }
 
@@ -145,7 +152,7 @@ class DatabaseController extends GetxController {
   Future<List<Map<String, dynamic>>> getChatMapList() async {
     Database db = await database;
     var result = await db.query(KStrings.tableChatList,
-        orderBy: '${KStrings.colChatListId} ASC');
+        orderBy: '${KStrings.colSenderTime} DESC');
     return result;
   }
 
@@ -155,7 +162,7 @@ class DatabaseController extends GetxController {
     var chatMapList = await getChatMapList();
 
     for (var chatMap in chatMapList) {
-      print(chatMap);
+      print("Chats....:$chatMap");
       chatList.add(ChatListModel.fromMapObject(chatMap));
     }
     update();
@@ -171,6 +178,7 @@ class DatabaseController extends GetxController {
       whereArgs: [id.toString()],
     );
     await getChatList();
+    update();
     return result;
   }
 
@@ -181,6 +189,7 @@ class DatabaseController extends GetxController {
     var result = await db.insert(KStrings.tableChatList, chat.toMap());
     await getChatList();
     print("Chat addeed........$result");
+    update();
     return result;
   }
 
@@ -194,6 +203,7 @@ class DatabaseController extends GetxController {
     );
 
     await getChatList();
+    update();
     return result;
   }
 
@@ -211,6 +221,7 @@ class DatabaseController extends GetxController {
     var groupUserMapList = await getGroupUserMapList();
 
     for (var groupUserMap in groupUserMapList) {
+      print("Group....: $groupUserMap");
       groupUserList.add(GroupUserListModel.fromMapObject(groupUserMap));
     }
     update();
@@ -226,6 +237,7 @@ class DatabaseController extends GetxController {
       whereArgs: [id.toString()],
     );
     await getGroupUserList();
+    update();
     return result;
   }
 
@@ -234,6 +246,7 @@ class DatabaseController extends GetxController {
     Database db = await database;
     var result = await db.insert(KStrings.tableGroupList, groupUser.toMap());
     await getGroupUserList();
+    update();
     return result;
   }
 
@@ -247,6 +260,7 @@ class DatabaseController extends GetxController {
     );
 
     await getGroupUserList();
+    update();
     return result;
   }
 
@@ -255,6 +269,7 @@ class DatabaseController extends GetxController {
     Database db = await database;
     var result = await db.query(KStrings.tableTrainer,
         orderBy: '${KStrings.colTrainerId} ASC');
+
     return result;
   }
 
@@ -279,6 +294,7 @@ class DatabaseController extends GetxController {
       whereArgs: [id.toString()],
     );
     await getTrainerChatList();
+    update();
     return result;
   }
 
@@ -287,6 +303,7 @@ class DatabaseController extends GetxController {
     Database db = await database;
     var result = await db.insert(KStrings.tableTrainer, trainerChat.toMap());
     await getTrainerChatList();
+    update();
     return result;
   }
 
@@ -300,6 +317,7 @@ class DatabaseController extends GetxController {
     );
 
     await getTrainerChatList();
+    update();
     return result;
   }
 }

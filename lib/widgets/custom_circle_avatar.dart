@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/models/friend_list.dart';
+import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,12 +16,14 @@ class CustomeCircleAvatar extends StatelessWidget {
     this.onlineDotSize,
     this.borderWidth = 3,
     this.picRadius,
+    this.showDay = true,
   }) : super(key: key);
 
   final FriendListModel user;
   final double? onlineDotSize;
   final double borderWidth;
   final double? picRadius;
+  final bool? showDay;
 
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
@@ -32,14 +34,14 @@ class CustomeCircleAvatar extends StatelessWidget {
       fit: StackFit.passthrough,
       alignment: Alignment.center,
       children: [
-        user.hasDay!
+        user.hasDay! && showDay!
             ? Container(
                 width: customWidth(.16),
                 height: customWidth(.16),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: SThemeData.lightThemeColor,
+                    color: SThemeData.blueDotColor,
                     width: 3,
                   ),
                 ),
@@ -59,7 +61,7 @@ class CustomeCircleAvatar extends StatelessWidget {
               )
             : CircleAvatar(
                 backgroundImage: FileImage(File(user.imageUrl!)),
-                radius: picRadius ?? customWidth(.08),
+                radius: picRadius ?? customWidth(.07),
               ),
         user.isOnline == true && user.isBlock == false
             ? Positioned(

@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 class FriendListModel {
   int? id;
   String? name;
@@ -22,7 +20,7 @@ class FriendListModel {
     required this.lastMessageTime,
     required this.lastMessage,
     required this.inactiveTime,
-    this.messageStatus = "not recived",
+    this.messageStatus = "not received",
     this.isOnline = true,
     this.isBlock = false,
     this.hasDay = false,
@@ -64,13 +62,44 @@ class FriendListModel {
     lastMessage = map['lastMessage'];
     inactiveTime = map['inactiveTime'];
     messageStatus = map['messageStatus'];
-    isOnline = map['isOnline'] == 1;
-    isBlock = map['isBlock'] == 1;
-    hasDay = map['hasDay'] == 1;
+    isOnline = map['isOnline'] == "1";
+    isBlock = map['isBlock'] == "1";
+    hasDay = map['hasDay'] == "1";
     chatColor = int.parse(map['chatColor']);
     welcomeMessage = map['welcomeMessage'];
     address = map['address'];
-    hasGroup = map['hasGroup'] == 1;
+    hasGroup = map['hasGroup'] == "1";
+  }
+
+  FriendListModel copyWith({
+    String? name,
+    String? imageUrl,
+    DateTime? lastMessageTime,
+    String? messageStatus,
+    bool? isOnline,
+    bool? isBlock,
+    String? lastMessage,
+    bool? hasDay,
+    int? chatColor,
+    String? inactiveTime,
+    String? welcomeMessage,
+    String? address,
+    bool? hasGroup,
+  }) {
+    return FriendListModel(
+        name: name ?? this.name,
+        imageUrl: imageUrl ?? this.imageUrl,
+        lastMessageTime: lastMessageTime ?? this.lastMessageTime,
+        lastMessage: lastMessage ?? this.lastMessage,
+        inactiveTime: inactiveTime ?? this.inactiveTime,
+        messageStatus: messageStatus ?? this.messageStatus,
+        isOnline: isOnline ?? this.isOnline,
+        isBlock: isBlock ?? this.isBlock,
+        hasDay: hasDay ?? this.hasDay,
+        chatColor: chatColor ?? this.chatColor,
+        welcomeMessage: welcomeMessage ?? this.welcomeMessage,
+        address: address ?? this.address,
+        hasGroup: hasGroup ?? this.hasGroup);
   }
 }
 

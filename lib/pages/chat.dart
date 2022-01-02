@@ -3,14 +3,16 @@ import 'dart:ffi';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/models/chat_list.dart';
-import 'package:fakeingbar/models/friend_list.dart';
+import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
+import 'package:fakeingbar/models/chat_list_model.dart';
+import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -41,10 +43,10 @@ class _ChatState extends State<Chat> {
   List<String> chatSetting = [];
 
   final _textBox = "".obs;
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   void initState() {
-    _chatList = _chatListController.chatlist;
     chatSetting = [
       "Block",
       "Set Profile Picture",
@@ -56,21 +58,29 @@ class _ChatState extends State<Chat> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          _buildAppBar(),
-          _buildChat(),
-          _buildBottomChat(),
-        ],
-      ),
+    return GetBuilder<DatabaseController>(
+      builder: (_databaseController) {
+        _chatList = _databaseController.chatList
+            .where((chat) => chat.friendListID == widget.user.id!)
+            .toList();
+        print("ChatList: $_chatList");
+        return Scaffold(
+          body: Column(
+            children: <Widget>[
+              _buildAppBar(),
+              _buildChat(_databaseController),
+              _buildBottomChat(_databaseController),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  _buildChat() {
+  _buildChat(DatabaseController _databaseController) {
     return Expanded(
       child: SingleChildScrollView(
-        physics: ClampingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.end,
@@ -78,6 +88,7 @@ class _ChatState extends State<Chat> {
             CustomeCircleAvatar(
               user: widget.user,
               picRadius: 50,
+              onlineDotSize: 0,
             ),
             SizedBox(
               height: customWidth(.03),
@@ -93,21 +104,25 @@ class _ChatState extends State<Chat> {
             SizedBox(
               height: customWidth(.015),
             ),
-            Text(
-              widget.user.welcomeMessage!,
-              style: TextStyle(
-                color: _themeController.textColor,
-              ),
-            ),
+            !widget.user.hasGroup!
+                ? Text(
+                    widget.user.welcomeMessage!,
+                    style: TextStyle(
+                      color: _themeController.textColor,
+                    ),
+                  )
+                : const SizedBox(),
             SizedBox(
               height: customWidth(.015),
             ),
-            Text(
-              "Lives in ${widget.user.address}",
-              style: TextStyle(
-                color: _themeController.darkenTextColor,
-              ),
-            ),
+            !widget.user.hasGroup!
+                ? Text(
+                    "Lives in ${widget.user.address}",
+                    style: TextStyle(
+                      color: _themeController.darkenTextColor,
+                    ),
+                  )
+                : const SizedBox(),
             SizedBox(
               height: customWidth(.03),
             ),
@@ -146,7 +161,7 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  _buildBottomChat() {
+  _buildBottomChat(DatabaseController _databaseController) {
     return Obx(() => _chatListController.isUserBlocked.isFalse
         ? Container(
             decoration: BoxDecoration(
@@ -159,32 +174,37 @@ class _ChatState extends State<Chat> {
                   height: 20.0,
                   width: 22.0,
                   decoration: const BoxDecoration(
-                    //borderRadius: BorderRadius.circular(20.0),
-                    image: DecorationImage(
-                      image: AssetImage('images/noun_menu.png'),
-                      fit: BoxFit.cover,
-                    ),
+                      //borderRadius: BorderRadius.circular(20.0),
+                      // image: DecorationImage(
+                      //   image: AssetImage('images/noun_menu.png'),
+                      //   fit: BoxFit.cover,
+                      // ),
+                      ),
+                  child: SvgPicture.asset(
+                    'assets/svg/image2vector.svg',
+                    fit: BoxFit.scaleDown,
+                    color: SThemeData.chatColors[widget.user.chatColor!],
                   ),
                 ),
                 Expanded(
                   flex: 40,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
+                    children: [
                       Icon(
                         FontAwesomeIcons.camera,
                         size: 20.0,
-                        color: Colors.deepPurpleAccent,
+                        color: SThemeData.chatColors[widget.user.chatColor!],
                       ),
                       Icon(
                         CupertinoIcons.photo,
                         size: 20.0,
-                        color: Colors.deepPurpleAccent,
+                        color: SThemeData.chatColors[widget.user.chatColor!],
                       ),
                       Icon(
                         CupertinoIcons.mic_solid,
                         size: 20.0,
-                        color: Colors.deepPurpleAccent,
+                        color: SThemeData.chatColors[widget.user.chatColor!],
                       ),
                     ],
                   ),
@@ -195,6 +215,7 @@ class _ChatState extends State<Chat> {
                     width: MediaQuery.of(context).size.width - 40,
                     height: MediaQuery.of(context).size.width * .11,
                     child: TextField(
+                      controller: _textEditingController,
                       onChanged: (value) {
                         _textBox.value = value;
                       },
@@ -212,30 +233,49 @@ class _ChatState extends State<Chat> {
                           hintStyle: TextStyle(
                             color: _themeController.darkenTextColor,
                           ),
-                          suffixIcon: const Icon(
+                          suffixIcon: Icon(
                             FontAwesomeIcons.solidSmileBeam,
                             size: 22.0,
-                            color: Colors.deepPurpleAccent,
+                            color:
+                                SThemeData.chatColors[widget.user.chatColor!],
                           )),
                     ),
                   ),
                 ),
-                Obx(
-                  () => Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: customWidth(0.03)),
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        _textBox.isEmpty
-                            ? FontAwesomeIcons.solidThumbsUp
-                            : Icons.send,
-                        size: 22.0,
-                        color: Colors.deepPurpleAccent,
-                      ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: customWidth(0.03)),
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_textBox.isNotEmpty) {
+                        _databaseController.insertChat(ChatListModel(
+                            friendListID: widget.user.id,
+                            sendMessage: _textBox.value,
+                            memberID: '',
+                            receiveMessage: "hi",
+                            senderTime: DateTime.now(),
+                            receiveTime: DateTime.now(),
+                            isReceived: "received"));
+                        _databaseController.updateUser(
+                          widget.user.copyWith(
+                              lastMessage: _textBox.value,
+                              lastMessageTime: DateTime.now()),
+                          widget.user.id!,
+                        );
+                        setState(() {
+                          _textBox.value = "";
+                          _textEditingController.clear();
+                        });
+                      }
+                    },
+                    child: Icon(
+                      _textBox.isEmpty
+                          ? FontAwesomeIcons.solidThumbsUp
+                          : Icons.send,
+                      size: 22.0,
+                      color: SThemeData.chatColors[widget.user.chatColor!],
                     ),
                   ),
-                )
+                ),
               ],
             ))
         : Container(

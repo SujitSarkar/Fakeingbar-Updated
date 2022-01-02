@@ -47,4 +47,24 @@ class ChatListModel {
         DateTime.fromMillisecondsSinceEpoch((int.parse(map['receiveTime'])));
     isReceived = map['isReceived'];
   }
+
+  ChatListModel copyWith({
+    String? memberID,
+    int? friendListID,
+    String? sendMessage,
+    String? receiveMessage,
+    DateTime? senderTime,
+    DateTime? receiveTime,
+    String? isReceived,
+  }) {
+    return ChatListModel(
+      friendListID: friendListID ?? this.friendListID,
+      sendMessage: sendMessage ?? this.sendMessage,
+      memberID: memberID ?? this.memberID,
+      receiveMessage: receiveMessage ?? this.receiveMessage,
+      senderTime: senderTime ?? this.senderTime,
+      receiveTime: receiveTime ?? this.receiveTime,
+      isReceived: isReceived ?? this.isReceived,
+    );
+  }
 }
