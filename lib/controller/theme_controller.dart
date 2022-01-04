@@ -24,7 +24,7 @@ class ThemeController extends GetxController {
   Future<void> initializeData() async {
     pref = await SharedPreferences.getInstance();
     isLite(pref!.getBool('isLite') ?? true);
-    pref!.setString("profilePicPath", profilePicPath.value);
+    pref!.setString("profilePicPath", '');
     changeColors();
     update();
   }
@@ -34,6 +34,7 @@ class ThemeController extends GetxController {
     pref!.setBool('isLite', isLite.value);
     changeColors();
     update();
+    debugPrint("Theme change.... ${isLite.value}");
   }
 
   changeColors() {
@@ -42,14 +43,14 @@ class ThemeController extends GetxController {
       darkenTextColor = const Color(0xff787878);
       textColor = Colors.black;
       scaffoldBackgroundColor = Colors.white;
-      chatBGColor = Color(0xfff5f5f5);
+      chatBGColor = const Color(0xfff5f5f5);
       update();
     } else {
       backgroundColor = const Color(0xff303030);
       darkenTextColor = const Color(0xff898989);
       textColor = Colors.white;
       scaffoldBackgroundColor = Colors.black;
-      chatBGColor = Color(0xff303030);
+      chatBGColor = const Color(0xff303030);
       update();
     }
   }

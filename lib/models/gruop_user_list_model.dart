@@ -1,3 +1,5 @@
+import 'package:flutter_contacts/properties/group.dart';
+
 class GroupUserListModel {
   int? id;
   int? friendListID;
@@ -29,5 +31,18 @@ class GroupUserListModel {
     friendListID = int.parse(map['friendListID']);
     name = map['name'];
     imageUrl = map['imageUrl'];
+  }
+
+  //copyWith Method
+  GroupUserListModel copyWith({
+    int? friendListID,
+    String? name,
+    String? imageUrl,
+  }) {
+    return GroupUserListModel(
+      friendListID: friendListID ?? this.friendListID,
+      name: name ?? this.name,
+      imageUrl: imageUrl ?? this.imageUrl,
+    );
   }
 }

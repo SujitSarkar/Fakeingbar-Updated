@@ -16,18 +16,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
-// const listYourFriendChat = [
-//   'Nice to meet you!',
-//   'Hello',
-// ];
-// const listYourChat = [
-//   'Nice to meet you!',
-//   'Hi',
-// ];
-
 class Chat extends StatefulWidget {
-  final FriendListModel user;
-  const Chat({Key? key, required this.user}) : super(key: key);
+  const Chat({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _ChatState createState() => _ChatState();
@@ -53,6 +45,7 @@ class _ChatState extends State<Chat> {
       "Add Date/Time",
       "Chat Settings",
     ];
+    _chatList.clear();
     super.initState();
   }
 
@@ -60,17 +53,25 @@ class _ChatState extends State<Chat> {
   Widget build(BuildContext context) {
     return GetBuilder<DatabaseController>(
       builder: (_databaseController) {
-        _chatList = _databaseController.chatList
-            .where((chat) => chat.friendListID == widget.user.id!)
-            .toList();
+        // _chatList
+        //     // .addAll(_databaseController.chatList);
+
+        _chatList.addAll(_databaseController.currentUserChats);
         print("ChatList: $_chatList");
-        return Scaffold(
-          body: Column(
-            children: <Widget>[
-              _buildAppBar(),
-              _buildChat(_databaseController),
-              _buildBottomChat(_databaseController),
-            ],
+        return WillPopScope(
+          onWillPop: () async {
+            _databaseController.currentUserChats.clear();
+            debugPrint("${_databaseController.currentUserChats.length}");
+            return true;
+          },
+          child: Scaffold(
+            body: Column(
+              children: <Widget>[
+                _buildAppBar(_databaseController),
+                _buildChat(_databaseController),
+                _buildBottomChat(_databaseController),
+              ],
+            ),
           ),
         );
       },
@@ -86,7 +87,7 @@ class _ChatState extends State<Chat> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             CustomeCircleAvatar(
-              user: widget.user,
+              user: _databaseController.currentUser.value,
               picRadius: 50,
               onlineDotSize: 0,
             ),
@@ -94,7 +95,7 @@ class _ChatState extends State<Chat> {
               height: customWidth(.03),
             ),
             Text(
-              widget.user.name!,
+              _databaseController.currentUser.value.name!,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: customWidth(.065),
@@ -104,9 +105,9 @@ class _ChatState extends State<Chat> {
             SizedBox(
               height: customWidth(.015),
             ),
-            !widget.user.hasGroup!
+            !_databaseController.currentUser.value.hasGroup!
                 ? Text(
-                    widget.user.welcomeMessage!,
+                    _databaseController.currentUser.value.welcomeMessage!,
                     style: TextStyle(
                       color: _themeController.textColor,
                     ),
@@ -115,9 +116,9 @@ class _ChatState extends State<Chat> {
             SizedBox(
               height: customWidth(.015),
             ),
-            !widget.user.hasGroup!
+            !_databaseController.currentUser.value.hasGroup!
                 ? Text(
-                    "Lives in ${widget.user.address}",
+                    "Lives in ${_databaseController.currentUser.value.address}",
                     style: TextStyle(
                       color: _themeController.darkenTextColor,
                     ),
@@ -129,17 +130,17 @@ class _ChatState extends State<Chat> {
             ListView.builder(
               reverse: true,
               shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 // if (index != ListYourFriendChat.length - 1) {
                 return ChatBubble(
-                  chatList: _chatList[index],
-                  user: widget.user,
+                  chatList: _databaseController.currentUserChats[index],
+                  user: _databaseController.currentUser.value,
                 );
                 //} else {
                 //return
               },
-              itemCount: _chatList.length,
+              itemCount: _databaseController.currentUserChats.length,
             ),
           ],
         ),
@@ -147,22 +148,27 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  _buildAppBar() {
+  _buildAppBar(DatabaseController _databaseController) {
     return ChatAppBarAction(
       isScroll: _isScroll,
       isBack: true,
-      isOnline: widget.user.isOnline!,
-      title: widget.user.name!, //widget.friendItem!.name,
-      imageUrl: widget.user.imageUrl!, //widget.friendItem!.imageAvatarUrl,
-      subTitle: widget.user.isOnline == true
+      isOnline: _databaseController.currentUser.value.isOnline!,
+      title: _databaseController
+          .currentUser.value.name!, //widget.friendItem!.name,
+      imageUrl: _databaseController
+          .currentUser.value.imageUrl!, //widget.friendItem!.imageAvatarUrl,
+      subTitle: _databaseController.currentUser.value.isOnline == true
           ? 'Active now'
-          : "Active ${widget.user.inactiveTime}",
-      user: widget.user,
+          : _databaseController.currentUser.value.inactiveTime != null
+              ? "Active ${_databaseController.currentUser.value.inactiveTime}"
+              : "offline",
+      color: SThemeData
+          .chatColors[_databaseController.currentUser.value.chatColor!],
     );
   }
 
   _buildBottomChat(DatabaseController _databaseController) {
-    return Obx(() => _chatListController.isUserBlocked.isFalse
+    return _databaseController.currentUser.value.isBlock == false
         ? Container(
             decoration: BoxDecoration(
               color: _themeController.scaffoldBackgroundColor,
@@ -183,7 +189,8 @@ class _ChatState extends State<Chat> {
                   child: SvgPicture.asset(
                     'assets/svg/image2vector.svg',
                     fit: BoxFit.scaleDown,
-                    color: SThemeData.chatColors[widget.user.chatColor!],
+                    color: SThemeData.chatColors[
+                        _databaseController.currentUser.value.chatColor!],
                   ),
                 ),
                 Expanded(
@@ -194,17 +201,20 @@ class _ChatState extends State<Chat> {
                       Icon(
                         FontAwesomeIcons.camera,
                         size: 20.0,
-                        color: SThemeData.chatColors[widget.user.chatColor!],
+                        color: SThemeData.chatColors[
+                            _databaseController.currentUser.value.chatColor!],
                       ),
                       Icon(
                         CupertinoIcons.photo,
                         size: 20.0,
-                        color: SThemeData.chatColors[widget.user.chatColor!],
+                        color: SThemeData.chatColors[
+                            _databaseController.currentUser.value.chatColor!],
                       ),
                       Icon(
                         CupertinoIcons.mic_solid,
                         size: 20.0,
-                        color: SThemeData.chatColors[widget.user.chatColor!],
+                        color: SThemeData.chatColors[
+                            _databaseController.currentUser.value.chatColor!],
                       ),
                     ],
                   ),
@@ -217,7 +227,7 @@ class _ChatState extends State<Chat> {
                     child: TextField(
                       controller: _textEditingController,
                       onChanged: (value) {
-                        _textBox.value = value;
+                        _textBox(value);
                       },
                       decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(10.0),
@@ -236,8 +246,8 @@ class _ChatState extends State<Chat> {
                           suffixIcon: Icon(
                             FontAwesomeIcons.solidSmileBeam,
                             size: 22.0,
-                            color:
-                                SThemeData.chatColors[widget.user.chatColor!],
+                            color: SThemeData.chatColors[_databaseController
+                                .currentUser.value.chatColor!],
                           )),
                     ),
                   ),
@@ -248,7 +258,8 @@ class _ChatState extends State<Chat> {
                     onTap: () {
                       if (_textBox.isNotEmpty) {
                         _databaseController.insertChat(ChatListModel(
-                            friendListID: widget.user.id,
+                            friendListID:
+                                _databaseController.currentUser.value.id,
                             sendMessage: _textBox.value,
                             memberID: '',
                             receiveMessage: "hi",
@@ -256,24 +267,24 @@ class _ChatState extends State<Chat> {
                             receiveTime: DateTime.now(),
                             isReceived: "received"));
                         _databaseController.updateUser(
-                          widget.user.copyWith(
+                          _databaseController.currentUser.value.copyWith(
                               lastMessage: _textBox.value,
                               lastMessageTime: DateTime.now()),
-                          widget.user.id!,
+                          _databaseController.currentUser.value.id!,
                         );
-                        setState(() {
-                          _textBox.value = "";
-                          _textEditingController.clear();
-                        });
+
+                        _textBox.value = "";
+                        _textEditingController.clear();
                       }
                     },
-                    child: Icon(
-                      _textBox.isEmpty
-                          ? FontAwesomeIcons.solidThumbsUp
-                          : Icons.send,
-                      size: 22.0,
-                      color: SThemeData.chatColors[widget.user.chatColor!],
-                    ),
+                    child: Obx(() => Icon(
+                          _textBox.isEmpty
+                              ? FontAwesomeIcons.solidThumbsUp
+                              : Icons.send,
+                          size: 22.0,
+                          color: SThemeData.chatColors[
+                              _databaseController.currentUser.value.chatColor!],
+                        )),
                   ),
                 ),
               ],
@@ -299,7 +310,7 @@ class _ChatState extends State<Chat> {
                 ],
               ),
             ),
-          ));
+          );
   }
 }
 

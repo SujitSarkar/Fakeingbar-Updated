@@ -2,10 +2,10 @@ import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
+import 'package:fakeingbar/data/sharedpreference/sharepreferenceController.dart';
 import 'package:fakeingbar/pages/home_page.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    KSharedPreference _pref = Get.put(KSharedPreference());
     ThemeController _themeController = Get.put(ThemeController());
     FriendListController _friendListController =
         Get.put(FriendListController());

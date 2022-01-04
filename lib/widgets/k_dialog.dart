@@ -1,10 +1,7 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
-import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 import '../config.dart';
 import 'k_filled_button.dart';
@@ -13,19 +10,17 @@ import 'k_image_picker.dart';
 class KDialog extends StatelessWidget {
   KDialog({
     Key? key,
-    required DatabaseController databaseController,
     required TextEditingController newChatName,
     required this.name,
     required this.hintText,
+    required this.btnText,
     required this.onPressed,
-  })  : _databaseController = databaseController,
-        _newChatName = newChatName,
+  })  : _newChatName = newChatName,
         super(key: key);
 
   final ThemeController _themeController = Get.find();
-  final DatabaseController _databaseController;
   final TextEditingController _newChatName;
-  final String name, hintText;
+  final String name, hintText, btnText;
   final VoidCallback onPressed;
 
   @override
@@ -85,7 +80,7 @@ class KDialog extends StatelessWidget {
                   horizontal: customWidth(.04),
                 ),
                 child: KFilledButton(
-                  text: "Create",
+                  text: btnText,
                   btnColor: SThemeData.blueDotColor,
                   onPressed: onPressed,
                 ),
