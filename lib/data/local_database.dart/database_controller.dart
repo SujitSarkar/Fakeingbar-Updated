@@ -5,6 +5,7 @@ import 'package:fakeingbar/models/chat_list_model.dart';
 import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/models/gruop_user_list_model.dart';
 import 'package:fakeingbar/models/trainer_chat_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,6 +15,18 @@ class DatabaseController extends GetxController {
   RxList<ChatListModel> chatList = <ChatListModel>[].obs;
   RxList<GroupUserListModel> groupUserList = <GroupUserListModel>[].obs;
   RxList<TrainerChatModel> trainerChatList = <TrainerChatModel>[].obs;
+
+  Rx<FriendListModel> currentUser = FriendListModel().obs;
+  RxList<ChatListModel> currentUserChats = <ChatListModel>[].obs;
+
+  void updateCurrentUser(int i) {
+    currentUser.value = userList.firstWhere((element) => element.id == i);
+    currentUserChats.clear();
+    currentUserChats.addAll(chatList.where((chat) => chat.friendListID == i));
+    debugPrint("DB Current ID....: ${currentUser.value.id}");
+    debugPrint("DB Chats....: ${currentUserChats.length}");
+    update();
+  }
 
   static const _databaseName = "ChatDatabase.db";
   static const _databaseVersion = 1;

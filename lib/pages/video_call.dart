@@ -1,9 +1,15 @@
+import 'dart:io';
+
+import 'package:fakeingbar/data/sharedpreference/sharepreferenceController.dart';
+import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class VideoCallPage extends StatelessWidget {
-  final String? name,image;
-  const VideoCallPage({Key? key, this.image,this.name}):super(key: key);
+  final FriendListModel user;
+  VideoCallPage({Key? key, required this.user}) : super(key: key);
+  final KSharedPreference _pref = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +22,7 @@ class VideoCallPage extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.transparent,
               image: DecorationImage(
-                image: AssetImage(image!),
+                image: FileImage(File(user.imageUrl!)),
                 fit: BoxFit.cover,
               ),
             ),
@@ -31,8 +37,10 @@ class VideoCallPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          IconButton(onPressed: ()=>Navigator.pop(context),
-                              icon: const Icon(Icons.arrow_back,color: Colors.white)),
+                          IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(Icons.arrow_back,
+                                  color: Colors.white)),
                         ],
                       ),
                     ),
@@ -45,15 +53,17 @@ class VideoCallPage extends StatelessWidget {
                     Container(
                       height: 150,
                       width: 100,
-                      margin: const EdgeInsets.only(right: 10.0,top: 10.0),
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        image: DecorationImage(
-                          image: AssetImage('images/m1.jpg'),
-                          fit: BoxFit.cover
-                        )
-                      ),
+                      margin: const EdgeInsets.only(right: 10.0, top: 10.0),
+                      child: _pref.getString(_pref.profilePicPath)!.isNotEmpty
+                          ? Image.file(
+                              File(_pref.getString(_pref.profilePicPath)!),
+                              fit: BoxFit.cover)
+                          : Image.asset(
+                              'images/m1.jpg',
+                              fit: BoxFit.cover,
+                            ),
                     ),
+
                     ///Bottom Section
                     Container(
                       height: 95,
@@ -61,46 +71,48 @@ class VideoCallPage extends StatelessWidget {
                           color: Color(0xff1D1F1C),
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(25),
-                              topRight: Radius.circular(25)
-                          )
-                      ),
+                              topRight: Radius.circular(25))),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Container(
                               height: 6,
                               width: 35,
-                              margin:const EdgeInsets.only(top: 10),
+                              margin: const EdgeInsets.only(top: 10),
                               decoration: const BoxDecoration(
                                   color: Color(0xff5E615D),
-                                  borderRadius: BorderRadius.all(Radius.circular(20))
-                              )),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)))),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CircleAvatar(
                                 radius: 30,
                                 backgroundColor: Colors.grey[600],
-                                child: const Icon(Icons.person_add_rounded, color: Colors.white,size: 28),
+                                child: const Icon(Icons.person_add_rounded,
+                                    color: Colors.white, size: 28),
                               ),
                               const SizedBox(width: 20),
                               CircleAvatar(
                                 radius: 30,
                                 backgroundColor: Colors.grey[600],
-                                child: const Icon(CupertinoIcons.camera_rotate_fill, color: Colors.white,size: 28),
+                                child: const Icon(
+                                    CupertinoIcons.camera_rotate_fill,
+                                    color: Colors.white,
+                                    size: 28),
                               ),
                               const SizedBox(width: 20),
                               CircleAvatar(
                                   radius: 30,
                                   backgroundColor: Colors.grey[600],
-                                  child: const Icon(Icons.mic_sharp, color: Colors.white,size: 28)
-                              ),
+                                  child: const Icon(Icons.mic_sharp,
+                                      color: Colors.white, size: 28)),
                               const SizedBox(width: 20),
                               const CircleAvatar(
                                   radius: 30,
                                   backgroundColor: Colors.redAccent,
-                                  child: Icon(CupertinoIcons.phone_down_fill, color: Colors.white,size: 28)
-                              )
+                                  child: Icon(CupertinoIcons.phone_down_fill,
+                                      color: Colors.white, size: 28))
                             ],
                           ),
                         ],

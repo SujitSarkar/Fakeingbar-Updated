@@ -15,11 +15,11 @@ class FriendListModel {
   bool? hasGroup;
 
   FriendListModel({
-    required this.name,
-    required this.imageUrl,
-    required this.lastMessageTime,
-    required this.lastMessage,
-    required this.inactiveTime,
+    this.name,
+    this.imageUrl,
+    this.lastMessageTime,
+    this.lastMessage,
+    this.inactiveTime,
     this.messageStatus = "not received",
     this.isOnline = true,
     this.isBlock = false,

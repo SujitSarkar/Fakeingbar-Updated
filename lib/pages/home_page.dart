@@ -5,6 +5,7 @@ import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
+import 'package:fakeingbar/data/sharedpreference/sharepreferenceController.dart';
 import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/pages/profile_page.dart';
 import 'package:fakeingbar/pages/userday_toggol_page.dart';
@@ -21,6 +22,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -34,8 +36,18 @@ class _HomePageState extends State<HomePage> {
   final ThemeController _themeController = Get.find();
   final ChatListController _chatListController = Get.find();
   final FriendListController _friendListController = Get.find();
-  // final DatabaseController _databaseController = Get.find();
+  final KSharedPreference _pref = Get.find();
   TextEditingController _newChatName = TextEditingController();
+  // SharedPreferences? _pref1;
+  // Future<void> initializeData() async {
+  //   _pref1 = await SharedPreferences.getInstance();
+  // }
+
+  @override
+  void initState() {
+    // initializeData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +248,7 @@ class _HomePageState extends State<HomePage> {
   Widget _createChatDialog(DatabaseController _databaseController) => KDialog(
         name: "Create New Chat",
         hintText: "Enter Chat Name",
-        databaseController: _databaseController,
+        btnText: "Create",
         newChatName: _newChatName,
         onPressed: () async {
           if (_newChatName.text != "") {
@@ -267,7 +279,7 @@ class _HomePageState extends State<HomePage> {
       KDialog(
         name: "Create New Group",
         hintText: "Enter Group Name",
-        databaseController: _databaseController,
+        btnText: "Create",
         newChatName: _newChatName,
         onPressed: () async {
           if (_newChatName.text != "") {
@@ -301,32 +313,27 @@ class _HomePageState extends State<HomePage> {
               right: customWidth(.05),
             ),
             child: Container(
-                width: customWidth(.16),
-                height: customWidth(.16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: _themeController.scaffoldBackgroundColor,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(100),
-                  // child: _themeController.imageFile != null
-                  //     ? Image.file(
-                  //         _themeController.imageFile!,
-                  //         fit: BoxFit.cover,
-                  //       )
-                  //     : _themeController.pref!.getString("profilePicPath") !=
-                  //             null
-                  //         ? Image.asset(
-                  //             _themeController.pref!
-                  //                 .getString("profilePicPath")!,
-                  //             fit: BoxFit.cover)
-                  //         : Image.asset(
-                  //             'images/m1.jpg',
-                  //             fit: BoxFit.cover,
-                  //           ),
-                  child: Image.asset(_themeController.profilePicPath.value,
-                      fit: BoxFit.cover),
-                )),
+              width: customWidth(.16),
+              height: customWidth(.16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                color: _themeController.scaffoldBackgroundColor,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: _themeController.imageFile == null
+                    ? Image.asset(
+                        'images/m1.jpg',
+                        fit: BoxFit.cover,
+                      )
+                    : Image.file(
+                        File(_themeController.imageFile!.path),fit: BoxFit.cover,
+                      ),
+
+                // child: Image.asset(_themeController.profilePicPath.value,
+                //     fit: BoxFit.cover),
+              ),
+            ),
           ),
         ),
         Text(

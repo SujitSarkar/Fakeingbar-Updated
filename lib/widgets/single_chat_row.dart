@@ -47,9 +47,8 @@ class _SingleChatRowState extends State<SingleChatRow> {
         ),
         child: GestureDetector(
           onTap: () {
-            Get.to(() => Chat(
-                  user: widget.user,
-                ));
+            _databaseController.updateCurrentUser(widget.user.id!);
+            Get.to(() => Chat());
           },
           onLongPressDown: (pressDetails) {
             setState(() {
