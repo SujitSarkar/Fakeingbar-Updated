@@ -26,7 +26,8 @@ class KFilledButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         primary: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        padding: EdgeInsets.zero,
+        fixedSize: Size(width, height),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 5.0)),
         ),
@@ -42,7 +43,7 @@ class KFilledButton extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              fontSize: customWidth(.048),
+              fontSize: customWidth(.05),
               fontWeight: FontWeight.bold,
             ),
           ),

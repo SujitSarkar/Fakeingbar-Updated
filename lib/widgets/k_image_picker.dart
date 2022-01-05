@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
+import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,25 +21,13 @@ class KImagePicker extends StatefulWidget {
 
 class _KImagePickerState extends State<KImagePicker> {
   final ThemeController _themeController = Get.find();
-  final FriendListController _friendListController = Get.find();
-
-  Future<File?> pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    // Pick an image
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      return File(image.path);
-    } else {
-      return null;
-    }
-  }
+  final DatabaseController _databaseController = Get.find();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () async {
-          File? image = await pickImage();
+          File? image = await _databaseController.pickImage();
           if (image != null) {
             setState(() {
               _themeController.imageFile = image;
