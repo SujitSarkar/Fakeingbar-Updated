@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
@@ -16,7 +18,6 @@ import 'package:get/get.dart';
 
 class ChatAppBarAction extends StatelessWidget {
   final String title;
-  final bool isScroll;
   final bool isOnline;
   final bool isBack;
   final String subTitle;
@@ -26,7 +27,6 @@ class ChatAppBarAction extends StatelessWidget {
   ChatAppBarAction({
     Key? key,
     required this.title,
-    required this.isScroll,
     required this.isBack,
     required this.isOnline,
     required this.subTitle,
@@ -60,13 +60,6 @@ class ChatAppBarAction extends StatelessWidget {
         padding: const EdgeInsets.only(right: 12.0, top: 25.0),
         decoration: BoxDecoration(
           color: _themeController.scaffoldBackgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: isScroll ? Colors.black12 : Colors.white,
-              offset: const Offset(0.0, 1.0),
-              blurRadius: 10.0,
-            ),
-          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -246,7 +239,15 @@ class ChatAppBarAction extends StatelessWidget {
         print("$item Block.............$id");
         break;
       case 1:
-        KImagePicker();
+        File? image = await _databaseController.pickImage();
+        if (image != null) {
+          await _databaseController.updateUser(
+            _databaseController.currentUser.value
+                .copyWith(imageUrl: image.path),
+            userId,
+          );
+          _databaseController.updateCurrentUser(userId);
+        }
         print("$item Set Profile Picture............");
         break;
       case 2:

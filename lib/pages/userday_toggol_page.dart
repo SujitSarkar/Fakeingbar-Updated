@@ -17,18 +17,6 @@ class UserDayToggolPage extends StatefulWidget {
 
 class _UserDayToggolPageState extends State<UserDayToggolPage> {
   final ThemeController _themeController = Get.find();
-  final FriendListController _userController = Get.find();
-  final DatabaseController _databaseController = Get.find();
-
-  final List<FriendListModel> _users = [];
-  final List<bool> _dayUser = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _users.addAll(_databaseController.userList);
-    _dayUser.addAll(_users.map((e) => e.hasDay!));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +42,45 @@ class _UserDayToggolPageState extends State<UserDayToggolPage> {
                     ),
                   ],
                 ),
-                ..._users.map(
-                  (user) => Padding(
+                ..._databaseController.userList.map(
+                  (user) => Container(
+                    height: customWidth(0.2),
+                    width: double.infinity,
+                    alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 15.0, vertical: 5),
+                      horizontal: 15.0,
+                    ),
+                    margin: EdgeInsets.symmetric(vertical: customWidth(.01)),
                     child: Row(
+                      // leading: CustomeCircleAvatar(
+                      //   user: user,
+                      // ),
+                      // title: Text(
+                      //   user.name!,
+                      //   style: TextStyle(
+                      //     color: _themeController.textColor,
+                      //     fontSize: 16.0,
+                      //     fontWeight: FontWeight.w500,
+                      //   ),
+                      // ),
+                      // trailing: Switch(
+                      //   value: user.hasDay!,
+                      //   onChanged: (value) {
+                      //     // _userController.changeUserDay(_users[index]);
+                      //     setState(() {
+                      //       _databaseController.updateUser(
+                      //           user.copyWith(hasDay: value), user.id!);
+                      //     });
+                      //     print(user.hasDay!);
+                      //   },
+                      // ),
                       children: [
-                        CustomeCircleAvatar(
-                          user: user,
+                        SizedBox(
+                          width: customWidth(.17),
+                          height: customWidth(.17),
+                          child: CustomeCircleAvatar(
+                            user: user,
+                          ),
                         ),
                         SizedBox(
                           width: customWidth(.02),

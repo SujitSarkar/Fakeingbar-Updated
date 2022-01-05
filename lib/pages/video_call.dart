@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/data/sharedpreference/sharepreferenceController.dart';
 import 'package:fakeingbar/models/friend_list_model.dart';
+import 'package:fakeingbar/widgets/k_circuler_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -41,6 +43,13 @@ class VideoCallPage extends StatelessWidget {
                               onPressed: () => Navigator.pop(context),
                               icon: const Icon(Icons.arrow_back,
                                   color: Colors.white)),
+                          // KCirculerButton(
+                          //   child: Icon(
+                          //     Icons.person_add_rounded,
+                          //     color: Colors.white,
+                          //     size: 28,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -66,9 +75,10 @@ class VideoCallPage extends StatelessWidget {
 
                     ///Bottom Section
                     Container(
-                      height: 95,
+                      height: customWidth(.8),
+                      alignment: Alignment.topCenter,
                       decoration: const BoxDecoration(
-                          color: Color(0xff1D1F1C),
+                          color: Colors.transparent,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(25),
                               topRight: Radius.circular(25))),
@@ -78,9 +88,12 @@ class VideoCallPage extends StatelessWidget {
                           Container(
                               height: 6,
                               width: 35,
-                              margin: const EdgeInsets.only(top: 10),
+                              margin: const EdgeInsets.only(
+                                top: 10,
+                                bottom: 20,
+                              ),
                               decoration: const BoxDecoration(
-                                  color: Color(0xff5E615D),
+                                  color: Colors.transparent,
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)))),
                           Row(

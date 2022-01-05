@@ -7,6 +7,7 @@ import 'package:fakeingbar/models/gruop_user_list_model.dart';
 import 'package:fakeingbar/models/trainer_chat_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -332,5 +333,17 @@ class DatabaseController extends GetxController {
     await getTrainerChatList();
     update();
     return result;
+  }
+
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    // Pick an image
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      return File(image.path);
+    } else {
+      return null;
+    }
   }
 }
