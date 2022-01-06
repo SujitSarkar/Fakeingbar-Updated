@@ -1,36 +1,28 @@
+import 'package:fakeingbar/config.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class KCirculerButton extends StatelessWidget {
-  const KCirculerButton({Key? key, required this.child}) : super(key: key);
+  KCirculerButton({
+    Key? key,
+    required this.child,
+    required this.onPressed,
+    this.size,
+  }) : super(key: key);
 
   final Widget child;
+  final VoidCallback onPressed;
+  double? size;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: AlignmentDirectional.center,
-      children: [
-        Opacity(
-          opacity: .6,
-          child: Container(
-            height: 60,
-            width: 60,
-            decoration: BoxDecoration(
-              color: Colors.grey[600],
-              shape: BoxShape.circle,
-            ),
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.all(10),
-          color: Colors.transparent,
-          child: Icon(
-            Icons.person_add_rounded,
-            color: Colors.white,
-            size: 28,
-          ),
-        ),
-      ],
+    return MaterialButton(
+      onPressed: () => onPressed(),
+      child: child,
+      color: Colors.white10.withOpacity(.4),
+      shape: const CircleBorder(),
+      minWidth: size ?? 50,
+      height: size ?? 50,
     );
   }
 }

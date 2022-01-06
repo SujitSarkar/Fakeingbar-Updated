@@ -23,7 +23,12 @@ class DatabaseController extends GetxController {
   void updateCurrentUser(int i) {
     currentUser.value = userList.firstWhere((element) => element.id == i);
     currentUserChats.clear();
-    currentUserChats.addAll(chatList.where((chat) => chat.friendListID == i));
+    // currentUserChats.value.addAll(chatList.where((chat) => chat.friendListID == i));
+    for (var item in chatList) {
+      if (item.friendListID == i) {
+        currentUserChats.add(item);
+      }
+    }
     debugPrint("DB Current ID....: ${currentUser.value.id}");
     debugPrint("DB Chats....: ${currentUserChats.length}");
     update();
@@ -202,7 +207,7 @@ class DatabaseController extends GetxController {
     Database db = await database;
     var result = await db.insert(KStrings.tableChatList, chat.toMap());
     await getChatList();
-    print("Chat addeed........$result");
+    print("Chat addeed........$result...$chatList");
     update();
     return result;
   }
