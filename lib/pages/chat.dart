@@ -1,11 +1,8 @@
-import 'dart:ffi';
-
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/models/chat_list_model.dart';
-import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
@@ -149,8 +146,9 @@ class _ChatState extends State<Chat> {
                     physics: const ClampingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       return ChatBubble(
-                        chatList: _databaseController.currentUserChats[index],
-                        user: _databaseController.currentUser.value,
+                        // chatList: _databaseController.currentUserChats[index],
+                        index: _databaseController.currentUserChats[index].id!,
+                        user: _databaseController.currentUser,
                       );
                     },
                     itemCount: _databaseController.currentUserChats.length,
@@ -337,17 +335,17 @@ class _ChatState extends State<Chat> {
                                 _databaseController.currentUser.value.id!,
                               );
 
-                              _databaseController.currentUserChats.add(
-                                  ChatListModel(
-                                      friendListID: _databaseController
-                                          .currentUser.value.id,
-                                      sendMessage:
-                                          _textEditingController.text.trim(),
-                                      memberID: '',
-                                      receiveMessage: "hi",
-                                      senderTime: DateTime.now(),
-                                      receiveTime: DateTime.now(),
-                                      isReceived: "received"));
+                              // _databaseController.currentUserChats.add(
+                              //     ChatListModel(
+                              //         friendListID: _databaseController
+                              //             .currentUser.value.id,
+                              //         sendMessage:
+                              //             _textEditingController.text.trim(),
+                              //         memberID: '',
+                              //         receiveMessage: "hi",
+                              //         senderTime: DateTime.now(),
+                              //         receiveTime: DateTime.now(),
+                              //         isReceived: "received"));
 
                               _databaseController.updateCurrentUser(userId);
 

@@ -9,13 +9,13 @@ class ChatListModel {
   String? isReceived;
 
   ChatListModel({
-    required this.friendListID,
-    required this.sendMessage,
-    required this.memberID,
-    required this.receiveMessage,
-    required this.senderTime,
-    required this.receiveTime,
-    required this.isReceived,
+    this.friendListID,
+    this.sendMessage,
+    this.memberID,
+    this.receiveMessage,
+    this.senderTime,
+    this.receiveTime,
+    this.isReceived,
   });
 
   Map<String, dynamic> toMap() {
