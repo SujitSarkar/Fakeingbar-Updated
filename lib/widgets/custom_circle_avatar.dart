@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
@@ -26,7 +25,6 @@ class CustomeCircleAvatar extends StatelessWidget {
   final bool? showDay;
 
   final ThemeController _themeController = Get.find();
-  final ChatListController _chatListController = Get.find();
 
   @override
   Widget build(BuildContext context) {

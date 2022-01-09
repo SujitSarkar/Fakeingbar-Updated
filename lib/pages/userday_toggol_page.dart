@@ -1,5 +1,4 @@
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';

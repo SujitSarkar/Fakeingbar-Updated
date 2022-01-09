@@ -29,15 +29,15 @@ class KSharedPreference extends GetxController {
     }
   }
 
-  String? getString(String val) {
+  String getString(String val) {
     if (pref != null) {
       if (pref!.getString(val) != null) {
         return pref!.getString(val)!;
       } else {
-        return null;
+        return "";
       }
     } else {
-      return null;
+      return "";
     }
   }
 

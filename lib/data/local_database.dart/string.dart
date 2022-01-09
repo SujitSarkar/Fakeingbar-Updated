@@ -21,6 +21,7 @@ class KStrings {
   static const String colChatListId = "id";
   static const String colMemberID = "memberID";
   static const String colFkChatListFriendId = "friendListID";
+  static const String colMessageType = "messageType";
   static const String colSendMessage = "sendMessage";
   static const String colReceiveMessage = "receiveMessage";
   static const String colSenderTime = "senderTime";

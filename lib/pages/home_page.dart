@@ -1,19 +1,14 @@
 import 'dart:io';
 
 import 'package:fakeingbar/config.dart';
-import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/data/sharedpreference/sharepreferenceController.dart';
 import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/pages/profile_page.dart';
 import 'package:fakeingbar/pages/userday_toggol_page.dart';
-import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:fakeingbar/widgets/k_dialog.dart';
-import 'package:fakeingbar/widgets/k_filled_button.dart';
-import 'package:fakeingbar/widgets/k_image_picker.dart';
 import 'package:fakeingbar/widgets/single_chat_row.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +17,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -34,8 +28,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<PopupMenuButtonState> _key = GlobalKey();
   final ThemeController _themeController = Get.find();
-  final ChatListController _chatListController = Get.find();
-  final FriendListController _friendListController = Get.find();
   final KSharedPreference _pref = Get.find();
   TextEditingController _newChatName = TextEditingController();
   // SharedPreferences? _pref1;
@@ -252,15 +244,6 @@ class _HomePageState extends State<HomePage> {
         newChatName: _newChatName,
         onPressed: () async {
           if (_newChatName.text != "") {
-            // _chatListController.addNewChat(
-            //   name: _newChatName.text,
-            //   imageUrl: imageFile!.path,
-            //   msg: "hi",
-            //   lastOnlineTime: "lastOnlineTime",
-            //   isOnline: true,
-            //   hasDay: true,
-            //   isBlock: false,
-            // );
             int id = await _databaseController.insertUser(FriendListModel(
               name: _newChatName.text,
               imageUrl: _themeController.imageFile!.path,
@@ -321,15 +304,13 @@ class _HomePageState extends State<HomePage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: _themeController.imageFile == null
-                    ? Image.asset(
+                child: _pref.getString(_pref.profilePicPath).isNotEmpty
+                    ? Image.file(File(_pref.getString(_pref.profilePicPath)),
+                        fit: BoxFit.cover)
+                    : Image.asset(
                         'images/m1.jpg',
                         fit: BoxFit.cover,
-                      )
-                    : Image.file(
-                        File(_themeController.imageFile!.path),fit: BoxFit.cover,
                       ),
-
                 // child: Image.asset(_themeController.profilePicPath.value,
                 //     fit: BoxFit.cover),
               ),

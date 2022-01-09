@@ -1,5 +1,4 @@
 import 'package:fakeingbar/config.dart';
-import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/models/chat_list_model.dart';
@@ -8,6 +7,8 @@ import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:fakeingbar/widgets/k_chat_dialog.dart';
+import 'package:fakeingbar/widgets/k_filled_button.dart';
+import 'package:fakeingbar/widgets/k_voice_msg_sending_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -25,7 +26,6 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   final ThemeController _themeController = Get.find();
-  final ChatListController _chatListController = Get.find();
 
   List<String> chatSetting = [];
 
@@ -35,6 +35,7 @@ class _ChatState extends State<Chat> {
   final TextEditingController _textEditingController = TextEditingController();
   final TextEditingController _welcomeMsgController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
 
   late int userId;
 
@@ -172,8 +173,8 @@ class _ChatState extends State<Chat> {
         hintText1: _databaseController.currentUser.value.welcomeMessage!,
         hintText2: _databaseController.currentUser.value.address!,
         btnText: "Save",
-        onPressed: () {
-          _databaseController.updateUser(
+        onPressed: () async {
+          await _databaseController.updateUser(
               _databaseController.currentUser.value.copyWith(
                 welcomeMessage: _welcomeMsgController.text.trim().isNotEmpty
                     ? _welcomeMsgController.text.trim()
@@ -183,14 +184,7 @@ class _ChatState extends State<Chat> {
                     : _databaseController.currentUser.value.address,
               ),
               userId);
-          _databaseController.currentUser.value.welcomeMessage =
-              _welcomeMsgController.text.trim().isNotEmpty
-                  ? _welcomeMsgController.text.trim()
-                  : _databaseController.currentUser.value.welcomeMessage;
-          _databaseController.currentUser.value.address =
-              _addressController.text.trim().isNotEmpty
-                  ? _addressController.text.trim()
-                  : _databaseController.currentUser.value.address;
+
           _databaseController.updateCurrentUser(userId);
           Navigator.pop(context);
         },
@@ -266,11 +260,16 @@ class _ChatState extends State<Chat> {
                             color: SThemeData.chatColors[_databaseController
                                 .currentUser.value.chatColor!],
                           ),
-                          Icon(
-                            CupertinoIcons.mic_solid,
-                            size: 20.0,
-                            color: SThemeData.chatColors[_databaseController
-                                .currentUser.value.chatColor!],
+                          GestureDetector(
+                            onTap: () {
+                              _showVoiceMessageDialog();
+                            },
+                            child: Icon(
+                              CupertinoIcons.mic_solid,
+                              size: 20.0,
+                              color: SThemeData.chatColors[_databaseController
+                                  .currentUser.value.chatColor!],
+                            ),
                           ),
                         ],
                       ),
@@ -323,6 +322,7 @@ class _ChatState extends State<Chat> {
                                       sendMessage:
                                           _textEditingController.text.trim(),
                                       memberID: '',
+                                      messageType: "text",
                                       receiveMessage: "hi",
                                       senderTime: DateTime.now(),
                                       receiveTime: DateTime.now(),
@@ -334,19 +334,6 @@ class _ChatState extends State<Chat> {
                                     lastMessageTime: DateTime.now()),
                                 _databaseController.currentUser.value.id!,
                               );
-
-                              // _databaseController.currentUserChats.add(
-                              //     ChatListModel(
-                              //         friendListID: _databaseController
-                              //             .currentUser.value.id,
-                              //         sendMessage:
-                              //             _textEditingController.text.trim(),
-                              //         memberID: '',
-                              //         receiveMessage: "hi",
-                              //         senderTime: DateTime.now(),
-                              //         receiveTime: DateTime.now(),
-                              //         isReceived: "received"));
-
                               _databaseController.updateCurrentUser(userId);
 
                               _textBox.value = '';
@@ -354,14 +341,16 @@ class _ChatState extends State<Chat> {
                             }
                           }
                         },
-                        child: Obx(() => Icon(
-                              _textBox.isEmpty
-                                  ? FontAwesomeIcons.solidThumbsUp
-                                  : Icons.send,
-                              size: 22.0,
-                              color: SThemeData.chatColors[_databaseController
-                                  .currentUser.value.chatColor!],
-                            )),
+                        child: Obx(
+                          () => Icon(
+                            _textBox.isEmpty
+                                ? FontAwesomeIcons.solidThumbsUp
+                                : Icons.send,
+                            size: 22.0,
+                            color: SThemeData.chatColors[_databaseController
+                                .currentUser.value.chatColor!],
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -391,5 +380,42 @@ class _ChatState extends State<Chat> {
               );
       },
     );
+  }
+
+  Future<dynamic> _showVoiceMessageDialog() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return GetBuilder<DatabaseController>(
+            builder: (_databaseController) {
+              return KVoiceMsgSendingDialog(
+                time: _timeController,
+                hintText: "Set Time",
+                btnText: "Send",
+                onPressed: () async {
+                  if (_timeController.text.trim().isNotEmpty) {
+                    if (!DateTime.now().isBlank!) {
+                      await _databaseController.insertChat(ChatListModel(
+                          friendListID:
+                              _databaseController.currentUser.value.id,
+                          sendMessage: _timeController.text.trim(),
+                          memberID: '',
+                          messageType: "voice",
+                          receiveMessage: "hi",
+                          senderTime: DateTime.now(),
+                          receiveTime: DateTime.now(),
+                          isReceived: "received"));
+
+                      _databaseController.updateCurrentUser(userId);
+
+                      _timeController.clear();
+                      Navigator.pop(context);
+                    }
+                  }
+                },
+              );
+            },
+          );
+        });
   }
 }

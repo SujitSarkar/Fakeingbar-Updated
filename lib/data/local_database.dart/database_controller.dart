@@ -60,9 +60,9 @@ class DatabaseController extends GetxController {
     await db.execute(
         'CREATE TABLE ${KStrings.tableChatList}(${KStrings.colChatListId} INTEGER PRIMARY KEY AUTOINCREMENT, '
         '${KStrings.colMemberID} TEXT, ${KStrings.colFkChatListFriendId} TEXT, '
-        '${KStrings.colSendMessage} TEXT, ${KStrings.colReceiveMessage} TEXT, '
-        '${KStrings.colSenderTime} TEXT, ${KStrings.colReceiveTime} TEXT, '
-        '${KStrings.colIsReceived} TEXT)');
+        '${KStrings.colMessageType} TEXT, ${KStrings.colSendMessage} TEXT,'
+        '${KStrings.colReceiveMessage} TEXT, ${KStrings.colSenderTime} TEXT,'
+        '${KStrings.colReceiveTime} TEXT, ${KStrings.colIsReceived} TEXT)');
 
     await db.execute(
         'CREATE TABLE ${KStrings.tableGroupList}(${KStrings.colGroupListId} INTEGER PRIMARY KEY AUTOINCREMENT, '
