@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
@@ -167,8 +169,8 @@ class _ChatState extends State<Chat> {
     return showDialog(
       context: context,
       builder: (context) => KChatDialog(
-        welcomeMsg: _welcomeMsgController,
-        address: _addressController,
+        firstText: _welcomeMsgController,
+        secondText: _addressController,
         name: "Edit Chat",
         hintText1: _databaseController.currentUser.value.welcomeMessage!,
         hintText2: _databaseController.currentUser.value.address!,
@@ -254,16 +256,19 @@ class _ChatState extends State<Chat> {
                             color: SThemeData.chatColors[_databaseController
                                 .currentUser.value.chatColor!],
                           ),
-                          Icon(
-                            CupertinoIcons.photo,
-                            size: 20.0,
-                            color: SThemeData.chatColors[_databaseController
-                                .currentUser.value.chatColor!],
+                          GestureDetector(
+                            onTap: () async {
+                              await getImageForMessage(_databaseController);
+                            },
+                            child: Icon(
+                              CupertinoIcons.photo,
+                              size: 20.0,
+                              color: SThemeData.chatColors[_databaseController
+                                  .currentUser.value.chatColor!],
+                            ),
                           ),
                           GestureDetector(
-                            onTap: () {
-                              _showVoiceMessageDialog();
-                            },
+                            onTap: () => _showVoiceMessageDialog(),
                             child: Icon(
                               CupertinoIcons.mic_solid,
                               size: 20.0,
@@ -327,7 +332,7 @@ class _ChatState extends State<Chat> {
                                       senderTime: DateTime.now(),
                                       receiveTime: DateTime.now(),
                                       isReceived: "received"));
-                              _databaseController.updateUser(
+                              await _databaseController.updateUser(
                                 _databaseController.currentUser.value.copyWith(
                                     lastMessage:
                                         _textEditingController.text.trim(),
@@ -382,6 +387,34 @@ class _ChatState extends State<Chat> {
     );
   }
 
+  Future<void> getImageForMessage(
+      DatabaseController _databaseController) async {
+    File? image = await _databaseController.pickImage();
+    if (image != null) {
+      if (!DateTime.now().isBlank!) {
+        await _databaseController.insertChat(ChatListModel(
+            friendListID: _databaseController.currentUser.value.id,
+            sendMessage: image.path,
+            memberID: '',
+            messageType: "image",
+            receiveMessage: "hi",
+            senderTime: DateTime.now(),
+            receiveTime: DateTime.now(),
+            isReceived: "received"));
+        _databaseController.updateUser(
+          _databaseController.currentUser.value.copyWith(
+              lastMessage: "You sent an Image",
+              lastMessageTime: DateTime.now()),
+          _databaseController.currentUser.value.id!,
+        );
+        _databaseController.updateCurrentUser(userId);
+
+        _textBox.value = '';
+        _textEditingController.clear();
+      }
+    }
+  }
+
   Future<dynamic> _showVoiceMessageDialog() {
     return showDialog(
         context: context,
@@ -405,6 +438,12 @@ class _ChatState extends State<Chat> {
                           senderTime: DateTime.now(),
                           receiveTime: DateTime.now(),
                           isReceived: "received"));
+                      await _databaseController.updateUser(
+                        _databaseController.currentUser.value.copyWith(
+                            lastMessage: "You sent a Voice",
+                            lastMessageTime: DateTime.now()),
+                        _databaseController.currentUser.value.id!,
+                      );
 
                       _databaseController.updateCurrentUser(userId);
 

@@ -97,6 +97,7 @@ class DatabaseController extends GetxController {
     getUserList();
     getChatList();
     getGroupUserList();
+    getTrainerChatList();
   }
 
   ///Fetch "Friendlist" as Map list from DB
@@ -298,6 +299,7 @@ class DatabaseController extends GetxController {
     var trainerChatMapList = await getTrainerChatMapList();
 
     for (var trainerChatMap in trainerChatMapList) {
+      debugPrint("Trainer.....: $trainerChatMap");
       trainerChatList.add(TrainerChatModel.fromMapObject(trainerChatMap));
     }
     update();

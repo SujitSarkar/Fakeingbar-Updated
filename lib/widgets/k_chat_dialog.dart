@@ -10,20 +10,20 @@ import 'k_image_picker.dart';
 class KChatDialog extends StatelessWidget {
   KChatDialog({
     Key? key,
-    required TextEditingController welcomeMsg,
-    required TextEditingController address,
+    required TextEditingController firstText,
+    required TextEditingController secondText,
     required this.name,
     required this.hintText1,
     required this.hintText2,
     required this.btnText,
     required this.onPressed,
-  })  : _welcomeMsg = welcomeMsg,
-        _address = address,
+  })  : _firstText = firstText,
+        _secondText = secondText,
         super(key: key);
 
   final ThemeController _themeController = Get.find();
-  final TextEditingController _welcomeMsg;
-  final TextEditingController _address;
+  final TextEditingController _firstText;
+  final TextEditingController _secondText;
   final String name, hintText1, hintText2, btnText;
   final VoidCallback onPressed;
 
@@ -62,7 +62,7 @@ class KChatDialog extends StatelessWidget {
                 height: customWidth(.05),
               ),
               TextField(
-                controller: _welcomeMsg,
+                controller: _firstText,
                 decoration: InputDecoration(
                   hintText: hintText1,
                   border: UnderlineInputBorder(
@@ -76,7 +76,7 @@ class KChatDialog extends StatelessWidget {
                 height: customWidth(.05),
               ),
               TextField(
-                controller: _address,
+                controller: _secondText,
                 decoration: InputDecoration(
                   hintText: hintText2,
                   border: UnderlineInputBorder(

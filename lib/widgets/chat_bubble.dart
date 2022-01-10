@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/models/chat_list_model.dart';
@@ -122,81 +124,135 @@ class _ChatBubbleState extends State<ChatBubble> {
                                 ),
                               )
                             : chats.value.messageType == "voice"
-                                ? Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Container(
-                                      width: customWidth(.6),
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: customWidth(.004),
-                                        horizontal: customWidth(.02),
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: SThemeData.chatColors[
-                                            widget.user.value.chatColor!],
-                                        borderRadius: BorderRadius.circular(
-                                          customWidth(.1),
+                                ? Row(
+                                    children: [
+                                      Container(
+                                        padding:
+                                            EdgeInsets.all(customWidth(.02)),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: SThemeData.chatColors[
+                                              widget.user.value.chatColor!],
+                                        ),
+                                        child: const Icon(
+                                          Icons.share,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                            "assets/svg/triangle.svg",
-                                            fit: BoxFit.scaleDown,
-                                            height: 25,
-                                            width: 25,
+                                      SizedBox(
+                                        width: customWidth(.02),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Container(
+                                          width: customWidth(.6),
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: customWidth(.02),
+                                            horizontal: customWidth(.02),
                                           ),
-                                          SvgPicture.asset(
-                                            "assets/svg/sound_bar.svg",
-                                            fit: BoxFit.scaleDown,
-                                            height: 30,
-                                            width: 70,
+                                          decoration: BoxDecoration(
+                                            color: SThemeData.chatColors[
+                                                widget.user.value.chatColor!],
+                                            borderRadius: BorderRadius.circular(
+                                              customWidth(.04),
+                                            ),
                                           ),
-                                          Text(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                width: customWidth(.03),
+                                              ),
+                                              SvgPicture.asset(
+                                                "assets/svg/triangle.svg",
+                                                fit: BoxFit.scaleDown,
+                                                height: 20,
+                                                width: 20,
+                                                color: Colors.grey.shade300,
+                                              ),
+                                              const Spacer(),
+                                              SvgPicture.asset(
+                                                "assets/svg/sound_bar.svg",
+                                                fit: BoxFit.scaleDown,
+                                                height: 30,
+                                                width: 70,
+                                                color: Colors.white,
+                                              ),
+                                              const Spacer(),
+                                              Text(
+                                                chats.value.sendMessage!,
+                                                textWidthBasis:
+                                                    TextWidthBasis.longestLine,
+                                                style: const TextStyle(
+                                                  fontSize: 14.0,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w600,
+                                                  height: 1,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: customWidth(.03),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : chats.value.messageType == "image"
+                                    ? Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Container(
+                                            width: customWidth(.6),
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: customWidth(.02),
+                                              horizontal: customWidth(.02),
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: SThemeData.chatColors[
+                                                  widget.user.value.chatColor!],
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                customWidth(.04),
+                                              ),
+                                            ),
+                                            child: Image.file(File(
+                                                chats.value.sendMessage!))),
+                                      )
+                                    : Container(
+                                        alignment: Alignment.center,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: customWidth(.025),
+                                          horizontal: customWidth(.04),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: SThemeData.chatColors[
+                                              widget.user.value.chatColor!],
+                                          borderRadius: BorderRadius.circular(
+                                              customWidth(.08)),
+                                        ),
+                                        child: Container(
+                                          constraints: BoxConstraints(
+                                              maxWidth: customWidth(.5)),
+                                          child: Text(
                                             chats.value.sendMessage!,
                                             textWidthBasis:
                                                 TextWidthBasis.longestLine,
                                             style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: _themeController
-                                                  .darkenTextColor,
+                                              fontSize: 15.0,
+                                              color: _themeController.textColor,
                                               fontWeight: FontWeight.w400,
-                                              height: 1,
+                                              height: 1.3,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    alignment: Alignment.center,
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: customWidth(.025),
-                                      horizontal: customWidth(.04),
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: SThemeData.chatColors[
-                                          widget.user.value.chatColor!],
-                                      borderRadius: BorderRadius.circular(
-                                          customWidth(.1)),
-                                    ),
-                                    child: Container(
-                                      constraints: BoxConstraints(
-                                          maxWidth: customWidth(.5)),
-                                      child: Text(
-                                        chats.value.sendMessage!,
-                                        textWidthBasis:
-                                            TextWidthBasis.longestLine,
-                                        style: TextStyle(
-                                          fontSize: 15.0,
-                                          color: _themeController.textColor,
-                                          fontWeight: FontWeight.w400,
-                                          height: 1.3,
                                         ),
                                       ),
-                                    ),
-                                  ),
-                    const SizedBox(width: 15.0),
+                    const SizedBox(width: 12.0),
                     chats.value.isReceived == "not send"
                         ? Icon(
                             Icons.circle_outlined,
