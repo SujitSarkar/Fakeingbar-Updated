@@ -320,6 +320,16 @@ class _ChatState extends State<Chat> {
                           if (_textBox.isNotEmpty &&
                               _textEditingController.text.trim().isNotEmpty) {
                             if (!DateTime.now().isBlank!) {
+                              String reply = "";
+                              _databaseController.trainerChatList.map((chat) {
+                                if (chat.question ==
+                                    _textEditingController.text.trim()) {
+                                  print(
+                                      "question: ${chat.question}, answer: ${chat.answer}");
+                                  reply = chat.answer!;
+                                  return;
+                                }
+                              });
                               await _databaseController.insertChat(
                                   ChatListModel(
                                       friendListID: _databaseController
@@ -328,7 +338,7 @@ class _ChatState extends State<Chat> {
                                           _textEditingController.text.trim(),
                                       memberID: '',
                                       messageType: "text",
-                                      receiveMessage: "hi",
+                                      receiveMessage: reply,
                                       senderTime: DateTime.now(),
                                       receiveTime: DateTime.now(),
                                       isReceived: "received"));
