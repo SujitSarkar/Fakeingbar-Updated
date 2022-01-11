@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class Chat extends StatefulWidget {
   const Chat({
@@ -32,6 +33,7 @@ class _ChatState extends State<Chat> {
   List<String> chatSetting = [];
 
   final ScrollController _scrollController = ScrollController();
+  // final ItemScrollController _itemScrollController = ItemScrollController();
 
   final _textBox = "".obs;
   final TextEditingController _textEditingController = TextEditingController();
@@ -49,12 +51,31 @@ class _ChatState extends State<Chat> {
       "Add Date/Time",
       "Chat Settings",
     ];
+    // _animateToIndex(0);
+    // scrollDown();
 
-    if (_scrollController.hasClients) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    }
+    Future.delayed(Duration(milliseconds: 500)).then((_) => scrollDown());
+
     super.initState();
   }
+
+  scrollDown() {
+    final double end = _scrollController.position.maxScrollExtent + 120;
+    _scrollController.animateTo(end,
+        duration: Duration(microseconds: 1), curve: Curves.easeOut);
+  }
+
+  // void _animateToIndex(int index) {
+  //   _scrollController.animateToItem(index,
+  //       duration: const Duration(milliseconds: 600), curve: Curves.linear);
+  // }
+
+  // void _scrollToIndex(int index) {
+  //   _itemScrollController.scrollTo(
+  //       index: index,
+  //       duration: Duration(seconds: 2),
+  //       curve: Curves.easeInOutCubic);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +83,8 @@ class _ChatState extends State<Chat> {
       builder: (_databaseController) {
         print("ChatList: ${_databaseController.currentUserChats}");
         userId = _databaseController.currentUser.value.id!;
+        // _animateToIndex(_databaseController.currentUserChats.length - 1);
+
         return WillPopScope(
           onWillPop: () async {
             _databaseController.currentUserChats.clear();
@@ -87,6 +110,7 @@ class _ChatState extends State<Chat> {
       builder: (_databaseController) {
         return Expanded(
           child: SingleChildScrollView(
+            controller: _scrollController,
             physics: const ClampingScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -145,13 +169,16 @@ class _ChatState extends State<Chat> {
                   () => ListView.builder(
                     reverse: true,
                     shrinkWrap: true,
-                    // controller: _scrollController,
+                    // itemScrollController: _itemScrollController,
+
                     physics: const ClampingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
+                      print("new: $index old: ${_databaseController.isNew}");
                       return ChatBubble(
                         // chatList: _databaseController.currentUserChats[index],
-                        index: _databaseController.currentUserChats[index].id!,
+                        chatId: _databaseController.currentUserChats[index].id!,
                         user: _databaseController.currentUser,
+                        chatIndex: index,
                       );
                     },
                     itemCount: _databaseController.currentUserChats.length,
@@ -312,6 +339,7 @@ class _ChatState extends State<Chat> {
                         ),
                       ),
                     ),
+                    //Send Button
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: customWidth(0.03)),
@@ -320,16 +348,17 @@ class _ChatState extends State<Chat> {
                           if (_textBox.isNotEmpty &&
                               _textEditingController.text.trim().isNotEmpty) {
                             if (!DateTime.now().isBlank!) {
-                              String reply = "";
-                              _databaseController.trainerChatList.map((chat) {
+                              String reply = "hi";
+
+                              for (var chat
+                                  in _databaseController.trainerChatList) {
                                 if (chat.question ==
                                     _textEditingController.text.trim()) {
                                   print(
                                       "question: ${chat.question}, answer: ${chat.answer}");
                                   reply = chat.answer!;
-                                  return;
                                 }
-                              });
+                              }
                               await _databaseController.insertChat(
                                   ChatListModel(
                                       friendListID: _databaseController
@@ -353,6 +382,12 @@ class _ChatState extends State<Chat> {
 
                               _textBox.value = '';
                               _textEditingController.clear();
+
+                              _databaseController.isNew(true);
+                              // _scrollToIndex(
+                              //     _databaseController.currentUserChats.length +
+                              //         1);
+                              scrollDown();
                             }
                           }
                         },
@@ -370,6 +405,7 @@ class _ChatState extends State<Chat> {
                     ),
                   ],
                 ))
+            //user block
             : Container(
                 height: customWidth(.175),
                 width: double.infinity,

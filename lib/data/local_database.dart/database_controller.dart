@@ -20,6 +20,8 @@ class DatabaseController extends GetxController {
   Rx<FriendListModel> currentUser = FriendListModel().obs;
   RxList<ChatListModel> currentUserChats = <ChatListModel>[].obs;
 
+  RxBool isNew = false.obs;
+
   void updateCurrentUser(int i) {
     currentUser.value = userList.firstWhere((element) => element.id == i);
     currentUserChats.clear();

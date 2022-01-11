@@ -59,6 +59,7 @@ class _HomePageState extends State<HomePage> {
                 _appbarSection(context),
                 Expanded(
                   child: ListView(
+                    physics: const ClampingScrollPhysics(),
                     children: [
                       _searchSection(),
                       _daySection(_databaseController),
@@ -292,7 +293,7 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         InkWell(
-          onTap: () => Get.to(() => ProfilePage()),
+          onTap: () => Get.to(() => const ProfilePage()),
           child: Padding(
             padding: EdgeInsets.only(
               top: customWidth(.03),
