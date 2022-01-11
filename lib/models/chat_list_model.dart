@@ -2,6 +2,7 @@ class ChatListModel {
   int? id;
   String? memberID;
   int? friendListID;
+  String? messageType;
   String? sendMessage;
   String? receiveMessage;
   DateTime? senderTime;
@@ -10,6 +11,7 @@ class ChatListModel {
 
   ChatListModel({
     this.friendListID,
+    this.messageType,
     this.sendMessage,
     this.memberID,
     this.receiveMessage,
@@ -25,6 +27,7 @@ class ChatListModel {
       map['id'] = id;
     }
     map['friendListID'] = friendListID;
+    map['messageType'] = messageType;
     map['sendMessage'] = sendMessage;
     map['memberID'] = memberID;
     map['receiveMessage'] = receiveMessage;
@@ -38,6 +41,7 @@ class ChatListModel {
   ChatListModel.fromMapObject(Map<String, dynamic> map) {
     id = map['id'];
     friendListID = int.parse(map['friendListID']);
+    messageType = map['messageType'];
     sendMessage = map['sendMessage'];
     memberID = map['memberID'];
     receiveMessage = map['receiveMessage'];
@@ -50,6 +54,7 @@ class ChatListModel {
 
   ChatListModel copyWith({
     String? memberID,
+    String? messageType,
     int? friendListID,
     String? sendMessage,
     String? receiveMessage,
@@ -59,6 +64,7 @@ class ChatListModel {
   }) {
     return ChatListModel(
       friendListID: friendListID ?? this.friendListID,
+      messageType: messageType ?? this.messageType,
       sendMessage: sendMessage ?? this.sendMessage,
       memberID: memberID ?? this.memberID,
       receiveMessage: receiveMessage ?? this.receiveMessage,

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/variables/theme_data.dart';

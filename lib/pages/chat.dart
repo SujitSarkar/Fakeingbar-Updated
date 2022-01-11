@@ -1,5 +1,6 @@
+import 'dart:io';
+
 import 'package:fakeingbar/config.dart';
-import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/models/chat_list_model.dart';
@@ -8,11 +9,14 @@ import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:fakeingbar/widgets/k_chat_dialog.dart';
+import 'package:fakeingbar/widgets/k_filled_button.dart';
+import 'package:fakeingbar/widgets/k_voice_msg_sending_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class Chat extends StatefulWidget {
   const Chat({
@@ -25,16 +29,17 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   final ThemeController _themeController = Get.find();
-  final ChatListController _chatListController = Get.find();
 
   List<String> chatSetting = [];
 
   final ScrollController _scrollController = ScrollController();
+  // final ItemScrollController _itemScrollController = ItemScrollController();
 
   final _textBox = "".obs;
   final TextEditingController _textEditingController = TextEditingController();
   final TextEditingController _welcomeMsgController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
 
   late int userId;
 
@@ -46,12 +51,31 @@ class _ChatState extends State<Chat> {
       "Add Date/Time",
       "Chat Settings",
     ];
+    // _animateToIndex(0);
+    // scrollDown();
 
-    if (_scrollController.hasClients) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    }
+    Future.delayed(Duration(milliseconds: 500)).then((_) => scrollDown());
+
     super.initState();
   }
+
+  scrollDown() {
+    final double end = _scrollController.position.maxScrollExtent + 120;
+    _scrollController.animateTo(end,
+        duration: Duration(microseconds: 1), curve: Curves.easeOut);
+  }
+
+  // void _animateToIndex(int index) {
+  //   _scrollController.animateToItem(index,
+  //       duration: const Duration(milliseconds: 600), curve: Curves.linear);
+  // }
+
+  // void _scrollToIndex(int index) {
+  //   _itemScrollController.scrollTo(
+  //       index: index,
+  //       duration: Duration(seconds: 2),
+  //       curve: Curves.easeInOutCubic);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +83,8 @@ class _ChatState extends State<Chat> {
       builder: (_databaseController) {
         print("ChatList: ${_databaseController.currentUserChats}");
         userId = _databaseController.currentUser.value.id!;
+        // _animateToIndex(_databaseController.currentUserChats.length - 1);
+
         return WillPopScope(
           onWillPop: () async {
             _databaseController.currentUserChats.clear();
@@ -84,6 +110,7 @@ class _ChatState extends State<Chat> {
       builder: (_databaseController) {
         return Expanded(
           child: SingleChildScrollView(
+            controller: _scrollController,
             physics: const ClampingScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -142,13 +169,16 @@ class _ChatState extends State<Chat> {
                   () => ListView.builder(
                     reverse: true,
                     shrinkWrap: true,
-                    // controller: _scrollController,
+                    // itemScrollController: _itemScrollController,
+
                     physics: const ClampingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
+                      print("new: $index old: ${_databaseController.isNew}");
                       return ChatBubble(
                         // chatList: _databaseController.currentUserChats[index],
-                        index: _databaseController.currentUserChats[index].id!,
+                        chatId: _databaseController.currentUserChats[index].id!,
                         user: _databaseController.currentUser,
+                        chatIndex: index,
                       );
                     },
                     itemCount: _databaseController.currentUserChats.length,
@@ -166,14 +196,14 @@ class _ChatState extends State<Chat> {
     return showDialog(
       context: context,
       builder: (context) => KChatDialog(
-        welcomeMsg: _welcomeMsgController,
-        address: _addressController,
+        firstText: _welcomeMsgController,
+        secondText: _addressController,
         name: "Edit Chat",
         hintText1: _databaseController.currentUser.value.welcomeMessage!,
         hintText2: _databaseController.currentUser.value.address!,
         btnText: "Save",
-        onPressed: () {
-          _databaseController.updateUser(
+        onPressed: () async {
+          await _databaseController.updateUser(
               _databaseController.currentUser.value.copyWith(
                 welcomeMessage: _welcomeMsgController.text.trim().isNotEmpty
                     ? _welcomeMsgController.text.trim()
@@ -183,14 +213,7 @@ class _ChatState extends State<Chat> {
                     : _databaseController.currentUser.value.address,
               ),
               userId);
-          _databaseController.currentUser.value.welcomeMessage =
-              _welcomeMsgController.text.trim().isNotEmpty
-                  ? _welcomeMsgController.text.trim()
-                  : _databaseController.currentUser.value.welcomeMessage;
-          _databaseController.currentUser.value.address =
-              _addressController.text.trim().isNotEmpty
-                  ? _addressController.text.trim()
-                  : _databaseController.currentUser.value.address;
+
           _databaseController.updateCurrentUser(userId);
           Navigator.pop(context);
         },
@@ -260,17 +283,25 @@ class _ChatState extends State<Chat> {
                             color: SThemeData.chatColors[_databaseController
                                 .currentUser.value.chatColor!],
                           ),
-                          Icon(
-                            CupertinoIcons.photo,
-                            size: 20.0,
-                            color: SThemeData.chatColors[_databaseController
-                                .currentUser.value.chatColor!],
+                          GestureDetector(
+                            onTap: () async {
+                              await getImageForMessage(_databaseController);
+                            },
+                            child: Icon(
+                              CupertinoIcons.photo,
+                              size: 20.0,
+                              color: SThemeData.chatColors[_databaseController
+                                  .currentUser.value.chatColor!],
+                            ),
                           ),
-                          Icon(
-                            CupertinoIcons.mic_solid,
-                            size: 20.0,
-                            color: SThemeData.chatColors[_databaseController
-                                .currentUser.value.chatColor!],
+                          GestureDetector(
+                            onTap: () => _showVoiceMessageDialog(),
+                            child: Icon(
+                              CupertinoIcons.mic_solid,
+                              size: 20.0,
+                              color: SThemeData.chatColors[_databaseController
+                                  .currentUser.value.chatColor!],
+                            ),
                           ),
                         ],
                       ),
@@ -308,6 +339,7 @@ class _ChatState extends State<Chat> {
                         ),
                       ),
                     ),
+                    //Send Button
                     Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: customWidth(0.03)),
@@ -316,6 +348,17 @@ class _ChatState extends State<Chat> {
                           if (_textBox.isNotEmpty &&
                               _textEditingController.text.trim().isNotEmpty) {
                             if (!DateTime.now().isBlank!) {
+                              String reply = "hi";
+
+                              for (var chat
+                                  in _databaseController.trainerChatList) {
+                                if (chat.question ==
+                                    _textEditingController.text.trim()) {
+                                  print(
+                                      "question: ${chat.question}, answer: ${chat.answer}");
+                                  reply = chat.answer!;
+                                }
+                              }
                               await _databaseController.insertChat(
                                   ChatListModel(
                                       friendListID: _databaseController
@@ -323,49 +366,46 @@ class _ChatState extends State<Chat> {
                                       sendMessage:
                                           _textEditingController.text.trim(),
                                       memberID: '',
-                                      receiveMessage: "hi",
+                                      messageType: "text",
+                                      receiveMessage: reply,
                                       senderTime: DateTime.now(),
                                       receiveTime: DateTime.now(),
                                       isReceived: "received"));
-                              _databaseController.updateUser(
+                              await _databaseController.updateUser(
                                 _databaseController.currentUser.value.copyWith(
                                     lastMessage:
                                         _textEditingController.text.trim(),
                                     lastMessageTime: DateTime.now()),
                                 _databaseController.currentUser.value.id!,
                               );
-
-                              // _databaseController.currentUserChats.add(
-                              //     ChatListModel(
-                              //         friendListID: _databaseController
-                              //             .currentUser.value.id,
-                              //         sendMessage:
-                              //             _textEditingController.text.trim(),
-                              //         memberID: '',
-                              //         receiveMessage: "hi",
-                              //         senderTime: DateTime.now(),
-                              //         receiveTime: DateTime.now(),
-                              //         isReceived: "received"));
-
                               _databaseController.updateCurrentUser(userId);
 
                               _textBox.value = '';
                               _textEditingController.clear();
+
+                              _databaseController.isNew(true);
+                              // _scrollToIndex(
+                              //     _databaseController.currentUserChats.length +
+                              //         1);
+                              scrollDown();
                             }
                           }
                         },
-                        child: Obx(() => Icon(
-                              _textBox.isEmpty
-                                  ? FontAwesomeIcons.solidThumbsUp
-                                  : Icons.send,
-                              size: 22.0,
-                              color: SThemeData.chatColors[_databaseController
-                                  .currentUser.value.chatColor!],
-                            )),
+                        child: Obx(
+                          () => Icon(
+                            _textBox.isEmpty
+                                ? FontAwesomeIcons.solidThumbsUp
+                                : Icons.send,
+                            size: 22.0,
+                            color: SThemeData.chatColors[_databaseController
+                                .currentUser.value.chatColor!],
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ))
+            //user block
             : Container(
                 height: customWidth(.175),
                 width: double.infinity,
@@ -391,5 +431,76 @@ class _ChatState extends State<Chat> {
               );
       },
     );
+  }
+
+  Future<void> getImageForMessage(
+      DatabaseController _databaseController) async {
+    File? image = await _databaseController.pickImage();
+    if (image != null) {
+      if (!DateTime.now().isBlank!) {
+        await _databaseController.insertChat(ChatListModel(
+            friendListID: _databaseController.currentUser.value.id,
+            sendMessage: image.path,
+            memberID: '',
+            messageType: "image",
+            receiveMessage: "hi",
+            senderTime: DateTime.now(),
+            receiveTime: DateTime.now(),
+            isReceived: "received"));
+        _databaseController.updateUser(
+          _databaseController.currentUser.value.copyWith(
+              lastMessage: "You sent an Image",
+              lastMessageTime: DateTime.now()),
+          _databaseController.currentUser.value.id!,
+        );
+        _databaseController.updateCurrentUser(userId);
+
+        _textBox.value = '';
+        _textEditingController.clear();
+      }
+    }
+  }
+
+  Future<dynamic> _showVoiceMessageDialog() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return GetBuilder<DatabaseController>(
+            builder: (_databaseController) {
+              return KVoiceMsgSendingDialog(
+                time: _timeController,
+                hintText: "Set Time",
+                btnText: "Send",
+                onPressed: () async {
+                  if (_timeController.text.trim().isNotEmpty) {
+                    if (!DateTime.now().isBlank!) {
+                      await _databaseController.insertChat(ChatListModel(
+                          friendListID:
+                              _databaseController.currentUser.value.id,
+                          sendMessage: _timeController.text.trim(),
+                          memberID: '',
+                          messageType: "voice",
+                          receiveMessage: "hi",
+                          senderTime: DateTime.now(),
+                          receiveTime: DateTime.now(),
+                          isReceived: "received"));
+                      await _databaseController.updateUser(
+                        _databaseController.currentUser.value.copyWith(
+                            lastMessage: "You sent a Voice",
+                            lastMessageTime: DateTime.now()),
+                        _databaseController.currentUser.value.id!,
+                      );
+
+                      _databaseController.updateCurrentUser(userId);
+
+                      _timeController.clear();
+                      Navigator.pop(context);
+                    }
+                  }
+                },
+              );
+            },
+          );
+        });
   }
 }

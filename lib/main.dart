@@ -1,6 +1,4 @@
-import 'package:fakeingbar/controller/chatlist_controller.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
-import 'package:fakeingbar/controller/friendList_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/data/sharedpreference/sharepreferenceController.dart';
 import 'package:fakeingbar/pages/home_page.dart';
@@ -24,9 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     KSharedPreference _pref = Get.put(KSharedPreference());
     ThemeController _themeController = Get.put(ThemeController());
-    FriendListController _friendListController =
-        Get.put(FriendListController());
-    ChatListController _chatController = Get.put(ChatListController());
+
     DatabaseController _databaeController = Get.put(DatabaseController());
     return GetBuilder<ThemeController>(builder: (controller) {
       return GetMaterialApp(

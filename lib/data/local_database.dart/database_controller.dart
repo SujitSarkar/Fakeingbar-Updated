@@ -20,6 +20,8 @@ class DatabaseController extends GetxController {
   Rx<FriendListModel> currentUser = FriendListModel().obs;
   RxList<ChatListModel> currentUserChats = <ChatListModel>[].obs;
 
+  RxBool isNew = false.obs;
+
   void updateCurrentUser(int i) {
     currentUser.value = userList.firstWhere((element) => element.id == i);
     currentUserChats.clear();
@@ -60,9 +62,9 @@ class DatabaseController extends GetxController {
     await db.execute(
         'CREATE TABLE ${KStrings.tableChatList}(${KStrings.colChatListId} INTEGER PRIMARY KEY AUTOINCREMENT, '
         '${KStrings.colMemberID} TEXT, ${KStrings.colFkChatListFriendId} TEXT, '
-        '${KStrings.colSendMessage} TEXT, ${KStrings.colReceiveMessage} TEXT, '
-        '${KStrings.colSenderTime} TEXT, ${KStrings.colReceiveTime} TEXT, '
-        '${KStrings.colIsReceived} TEXT)');
+        '${KStrings.colMessageType} TEXT, ${KStrings.colSendMessage} TEXT,'
+        '${KStrings.colReceiveMessage} TEXT, ${KStrings.colSenderTime} TEXT,'
+        '${KStrings.colReceiveTime} TEXT, ${KStrings.colIsReceived} TEXT)');
 
     await db.execute(
         'CREATE TABLE ${KStrings.tableGroupList}(${KStrings.colGroupListId} INTEGER PRIMARY KEY AUTOINCREMENT, '
@@ -97,6 +99,7 @@ class DatabaseController extends GetxController {
     getUserList();
     getChatList();
     getGroupUserList();
+    getTrainerChatList();
   }
 
   ///Fetch "Friendlist" as Map list from DB
@@ -298,6 +301,7 @@ class DatabaseController extends GetxController {
     var trainerChatMapList = await getTrainerChatMapList();
 
     for (var trainerChatMap in trainerChatMapList) {
+      debugPrint("Trainer.....: $trainerChatMap");
       trainerChatList.add(TrainerChatModel.fromMapObject(trainerChatMap));
     }
     update();

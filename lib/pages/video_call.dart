@@ -84,9 +84,9 @@ class VideoCallPage extends StatelessWidget {
                       right: customWidth(.05),
                       top: customWidth(.05),
                     ),
-                    child: _pref.getString(_pref.profilePicPath)!.isNotEmpty
+                    child: _pref.getString(_pref.profilePicPath).isNotEmpty
                         ? Image.file(
-                            File(_pref.getString(_pref.profilePicPath)!),
+                            File(_pref.getString(_pref.profilePicPath)),
                             fit: BoxFit.cover)
                         : Image.asset(
                             'images/m1.jpg',

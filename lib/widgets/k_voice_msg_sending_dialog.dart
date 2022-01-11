@@ -5,26 +5,20 @@ import 'package:get/get.dart';
 
 import '../config.dart';
 import 'k_filled_button.dart';
-import 'k_image_picker.dart';
 
-class KChatDialog extends StatelessWidget {
-  KChatDialog({
+class KVoiceMsgSendingDialog extends StatelessWidget {
+  KVoiceMsgSendingDialog({
     Key? key,
-    required TextEditingController firstText,
-    required TextEditingController secondText,
-    required this.name,
-    required this.hintText1,
-    required this.hintText2,
+    required TextEditingController time,
+    required this.hintText,
     required this.btnText,
     required this.onPressed,
-  })  : _firstText = firstText,
-        _secondText = secondText,
+  })  : _time = time,
         super(key: key);
 
   final ThemeController _themeController = Get.find();
-  final TextEditingController _firstText;
-  final TextEditingController _secondText;
-  final String name, hintText1, hintText2, btnText;
+  final TextEditingController _time;
+  final String hintText, btnText;
   final VoidCallback onPressed;
 
   @override
@@ -44,7 +38,7 @@ class KChatDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      name,
+                      "Voice Message",
                       style: TextStyle(
                         color: _themeController.textColor,
                         fontWeight: FontWeight.w400,
@@ -62,23 +56,9 @@ class KChatDialog extends StatelessWidget {
                 height: customWidth(.05),
               ),
               TextField(
-                controller: _firstText,
+                controller: _time,
                 decoration: InputDecoration(
-                  hintText: hintText1,
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: _themeController.textColor,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: customWidth(.05),
-              ),
-              TextField(
-                controller: _secondText,
-                decoration: InputDecoration(
-                  hintText: hintText2,
+                  hintText: hintText,
                   border: UnderlineInputBorder(
                     borderSide: BorderSide(
                       color: _themeController.textColor,

@@ -42,17 +42,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 GestureDetector(
                   onTap: () async {
+                    File? image;
                     ImagePicker _picker = ImagePicker();
                     await _picker
                         .pickImage(source: ImageSource.gallery)
                         .then((xFile) {
                       if (xFile != null) {
                         setState(() {
-                          _themeController.imageFile = File(xFile.path);
+                          image = File(xFile.path);
                         });
-                        _pref.setString(
-                            _pref.profilePicPath,
-                            _themeController.imageFile!.path);
+                        _pref.setString(_pref.profilePicPath, image!.path);
                       }
                     });
                   },
@@ -67,12 +66,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         borderRadius: BorderRadius.circular(100),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(100),
-                          child: _pref.getString(
-                                      _pref.profilePicPath)!
+                          child: _pref
+                                  .getString(_pref.profilePicPath)
                                   .isNotEmpty
                               ? Image.file(
-                                  File(_pref.getString(
-                                      _pref.profilePicPath)!),
+                                  File(_pref.getString(_pref.profilePicPath)),
                                   fit: BoxFit.cover)
                               : Image.asset(
                                   'images/m1.jpg',
