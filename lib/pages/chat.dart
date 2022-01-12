@@ -4,6 +4,7 @@ import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
 import 'package:fakeingbar/models/chat_list_model.dart';
+import 'package:fakeingbar/models/gruop_user_list_model.dart';
 import 'package:fakeingbar/variables/theme_data.dart';
 import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
@@ -43,6 +44,9 @@ class _ChatState extends State<Chat> {
 
   late int userId;
 
+  List<GroupUserListModel> groupMembers = [];
+  String memberID = '';
+
   @override
   void initState() {
     chatSetting = [
@@ -54,15 +58,15 @@ class _ChatState extends State<Chat> {
     // _animateToIndex(0);
     // scrollDown();
 
-    Future.delayed(Duration(milliseconds: 500)).then((_) => scrollDown());
+    Future.delayed(const Duration(milliseconds: 500)).then((_) => scrollDown());
 
     super.initState();
   }
 
   scrollDown() {
-    final double end = _scrollController.position.maxScrollExtent + 120;
+    final double end = _scrollController.position.maxScrollExtent + 500;
     _scrollController.animateTo(end,
-        duration: Duration(microseconds: 1), curve: Curves.easeOut);
+        duration: const Duration(microseconds: 1), curve: Curves.easeOut);
   }
 
   // void _animateToIndex(int index) {
@@ -83,7 +87,12 @@ class _ChatState extends State<Chat> {
       builder: (_databaseController) {
         print("ChatList: ${_databaseController.currentUserChats}");
         userId = _databaseController.currentUser.value.id!;
-        // _animateToIndex(_databaseController.currentUserChats.length - 1);
+        if (_databaseController.currentUser.value.hasGroup!) {
+          groupMembers = _databaseController.groupUserList
+              .where((g) =>
+                  g.friendListID == _databaseController.currentUser.value.id!)
+              .toList();
+        }
 
         return WillPopScope(
           onWillPop: () async {
@@ -174,6 +183,7 @@ class _ChatState extends State<Chat> {
                     physics: const ClampingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       print("new: $index old: ${_databaseController.isNew}");
+                      print("Member id.........: $memberID ");
                       return ChatBubble(
                         // chatList: _databaseController.currentUserChats[index],
                         chatId: _databaseController.currentUserChats[index].id!,
@@ -348,7 +358,43 @@ class _ChatState extends State<Chat> {
                           if (_textBox.isNotEmpty &&
                               _textEditingController.text.trim().isNotEmpty) {
                             if (!DateTime.now().isBlank!) {
-                              String reply = "hi";
+                              if (_databaseController
+                                  .currentUser.value.hasGroup!) {
+                                await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        child: IntrinsicHeight(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0,
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                ...groupMembers.map((group) {
+                                                  return ListTile(
+                                                    leading: CircleAvatar(
+                                                      backgroundImage:
+                                                          FileImage(File(
+                                                              group.imageUrl!)),
+                                                    ),
+                                                    title: Text(group.name!),
+                                                    onTap: () => setState(() {
+                                                      memberID =
+                                                          group.id!.toString();
+                                                      Navigator.pop(context);
+                                                    }),
+                                                  );
+                                                }),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              }
+                              String reply =
+                                  "Don't understand what you say!!😒";
 
                               for (var chat
                                   in _databaseController.trainerChatList) {
@@ -365,7 +411,7 @@ class _ChatState extends State<Chat> {
                                           .currentUser.value.id,
                                       sendMessage:
                                           _textEditingController.text.trim(),
-                                      memberID: '',
+                                      memberID: memberID,
                                       messageType: "text",
                                       receiveMessage: reply,
                                       senderTime: DateTime.now(),
@@ -388,6 +434,10 @@ class _ChatState extends State<Chat> {
                               //     _databaseController.currentUserChats.length +
                               //         1);
                               scrollDown();
+
+                              await Future.delayed(
+                                      const Duration(milliseconds: 2005))
+                                  .then((_) => scrollDown());
                             }
                           }
                         },

@@ -7,9 +7,9 @@ class GroupUserListModel {
   String? imageUrl;
 
   GroupUserListModel({
-    required this.friendListID,
-    required this.name,
-    required this.imageUrl,
+    this.friendListID,
+    this.name,
+    this.imageUrl,
   });
 
   Map<String, dynamic> toMap() {

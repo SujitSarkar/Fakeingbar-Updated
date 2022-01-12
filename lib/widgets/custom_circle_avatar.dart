@@ -16,6 +16,7 @@ class CustomeCircleAvatar extends StatelessWidget {
     this.borderWidth = 3,
     this.picRadius,
     this.showDay = true,
+    this.imageUrl,
   }) : super(key: key);
 
   final FriendListModel user;
@@ -23,6 +24,7 @@ class CustomeCircleAvatar extends StatelessWidget {
   final double borderWidth;
   final double? picRadius;
   final bool? showDay;
+  final String? imageUrl;
 
   final ThemeController _themeController = Get.find();
 
@@ -52,13 +54,14 @@ class CustomeCircleAvatar extends StatelessWidget {
                     ),
                   ),
                   child: CircleAvatar(
-                    backgroundImage: FileImage(File(user.imageUrl!)),
+                    backgroundImage:
+                        FileImage(File(imageUrl ?? user.imageUrl!)),
                     radius: picRadius ?? customWidth(.05),
                   ),
                 ),
               )
             : CircleAvatar(
-                backgroundImage: FileImage(File(user.imageUrl!)),
+                backgroundImage: FileImage(File(imageUrl ?? user.imageUrl!)),
                 radius: picRadius ?? customWidth(.07),
               ),
         user.isOnline == true && user.isBlock == false

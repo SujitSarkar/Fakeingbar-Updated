@@ -31,6 +31,7 @@ class DatabaseController extends GetxController {
         currentUserChats.add(item);
       }
     }
+
     debugPrint("DB Current ID....: ${currentUser.value.id}");
     debugPrint("DB Chats....: ${currentUserChats.length}");
     update();

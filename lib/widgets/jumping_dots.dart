@@ -13,7 +13,7 @@ class JumpingDots extends StatefulWidget {
 
 class _JumpingDotsState extends State<JumpingDots>
     with TickerProviderStateMixin {
-  late final List<AnimationController> _animationControllers;
+  late List<AnimationController> _animationControllers;
 
   final List<Animation<double>> _animations = [];
 
@@ -79,30 +79,28 @@ class _JumpingDotsState extends State<JumpingDots>
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(widget.numberOfDots, (index) {
-          //AnimatedBuilder widget will rebuild it self when
-          //_animationControllers[index] value changes.
-          return AnimatedBuilder(
-            animation: _animationControllers[index],
-            builder: (context, child) {
-              return Container(
-                padding: const EdgeInsets.all(2),
-                //Transform widget's translate constructor will help us to move the dot
-                //in upward direction by changing the offset of the dot.
-                //X-axis position of dot will not change.
-                //Only Y-axis position will change.
-                child: Transform.translate(
-                  offset: Offset(0, _animations[index].value),
-                  child: const DotWidget(),
-                ),
-              );
-            },
-          );
-        }).toList(),
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(widget.numberOfDots, (index) {
+        //AnimatedBuilder widget will rebuild it self when
+        //_animationControllers[index] value changes.
+        return AnimatedBuilder(
+          animation: _animationControllers[index],
+          builder: (context, child) {
+            return Container(
+              padding: const EdgeInsets.all(1.5),
+              //Transform widget's translate constructor will help us to move the dot
+              //in upward direction by changing the offset of the dot.
+              //X-axis position of dot will not change.
+              //Only Y-axis position will change.
+              child: Transform.translate(
+                offset: Offset(0, _animations[index].value),
+                child: const DotWidget(),
+              ),
+            );
+          },
+        );
+      }).toList(),
     );
   }
 }

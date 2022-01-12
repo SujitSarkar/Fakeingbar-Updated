@@ -8,10 +8,12 @@ class DotWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration:
-          const BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
-      height: 10,
-      width: 10,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.grey,
+      ),
+      height: 6.5,
+      width: 6.5,
     );
   }
 }

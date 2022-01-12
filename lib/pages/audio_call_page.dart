@@ -22,8 +22,6 @@ class AudioCall extends StatefulWidget {
 class _AudioCallState extends State<AudioCall> {
   final ThemeController _themeController = Get.find();
 
-  bool isVideo = false;
-
   final _count = 0.obs;
 
   String getDuration(int totalSeconds) {
@@ -105,27 +103,15 @@ class _AudioCallState extends State<AudioCall> {
                                     icon: const Icon(Icons.arrow_back,
                                         color: Colors.white)),
                                 Stack(
-                                  alignment: isVideo
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
+                                  alignment: Alignment.centerRight,
                                   children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          isVideo = !isVideo;
-                                          Get.to(() => VideoCallPage(
-                                              user: _databaseController
-                                                  .currentUser.value));
-                                        });
-                                      },
-                                      child: Container(
-                                        height: 25,
-                                        width: 70,
-                                        decoration: const BoxDecoration(
-                                            color: Color(0xff7B7F7E),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(20))),
-                                      ),
+                                    Container(
+                                      height: 25,
+                                      width: 70,
+                                      decoration: const BoxDecoration(
+                                          color: Color(0xff7B7F7E),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
                                     ),
                                     Container(
                                       height: 40,

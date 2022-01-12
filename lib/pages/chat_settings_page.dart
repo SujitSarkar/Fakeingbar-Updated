@@ -293,6 +293,9 @@ class _ChatSettingsPageState extends State<ChatSettingsPage> {
             ),
           ),
         ),
+        SizedBox(
+          height: customWidth(.04),
+        ),
         groupMembers.isEmpty
             ? const Padding(
                 padding: EdgeInsets.only(top: 10.0),
@@ -300,43 +303,58 @@ class _ChatSettingsPageState extends State<ChatSettingsPage> {
               )
             : const SizedBox(),
         ...groupMembers.map((group) {
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: FileImage(File(group.imageUrl!)),
-            ),
-            title: Text(group.name!),
-            trailing: IconButton(
-              icon: Icon(
-                Icons.edit,
-                color: _themeController.darkenTextColor,
-                size: customWidth(.05),
+          return Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: FileImage(File(group.imageUrl!)),
               ),
-              onPressed: () => showDialog(
-                context: context,
-                builder: (context) {
-                  _addMemberController.text = group.name!;
-                  return KDialog(
-                    newChatName: _addMemberController,
-                    name: "Edit Member",
-                    hintText: "Member Name",
-                    btnText: "Save",
-                    onPressed: () async {
-                      await _databaseController.updateGroupUser(
-                        group.copyWith(
-                          name: _addMemberController.text,
-                          imageUrl: _themeController.imageFile == null
-                              ? group.imageUrl
-                              : _themeController.imageFile!.path,
-                        ),
-                        group.id!,
-                      );
-                      await _databaseController.getGroupUserList();
-                      Navigator.pop(context);
-                    },
-                  );
-                },
+              SizedBox(
+                width: customWidth(.05),
               ),
-            ),
+              Text(group.name!),
+              Spacer(),
+              IconButton(
+                icon: Icon(
+                  Icons.edit,
+                  color: _themeController.darkenTextColor,
+                  size: customWidth(.05),
+                ),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) {
+                    _addMemberController.text = group.name!;
+                    return KDialog(
+                      newChatName: _addMemberController,
+                      name: "Edit Member",
+                      hintText: "Member Name",
+                      btnText: "Save",
+                      onPressed: () async {
+                        await _databaseController.updateGroupUser(
+                          group.copyWith(
+                            name: _addMemberController.text,
+                            imageUrl: _themeController.imageFile == null
+                                ? group.imageUrl
+                                : _themeController.imageFile!.path,
+                          ),
+                          group.id!,
+                        );
+                        await _databaseController.getGroupUserList();
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+              IconButton(
+                  onPressed: () async {
+                    await _databaseController.deleteGroupUser(group.id!);
+                  },
+                  icon: Icon(
+                    Icons.delete_forever,
+                    color: _themeController.darkenTextColor,
+                    size: customWidth(.05),
+                  )),
+            ],
           );
         }),
         IconButton(
@@ -357,6 +375,7 @@ class _ChatSettingsPageState extends State<ChatSettingsPage> {
                       ),
                     );
                     await _databaseController.getGroupUserList();
+                    Navigator.pop(context);
                   },
                 );
               }),
