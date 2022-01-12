@@ -36,7 +36,8 @@ class _KImagePickerState extends State<KImagePicker> {
         child: Container(
           width: customWidth(.2),
           height: customWidth(.2),
-          padding: EdgeInsets.all(customWidth(.02)),
+          padding: EdgeInsets.all(customWidth(.03)),
+          clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: _themeController.chatBGColor,
             border: Border.all(
@@ -52,13 +53,10 @@ class _KImagePickerState extends State<KImagePicker> {
                   ? Image.asset(
                       "images/person.png",
                       fit: BoxFit.fill,
-                      width: customWidth(.2),
-                      height: customWidth(.2),
                     )
                   : Image.file(
                       _themeController.imageFile!,
-                      width: customWidth(.2),
-                      height: customWidth(.2),
+                      fit: BoxFit.cover,
                     ),
               Positioned(
                 bottom: 0,
