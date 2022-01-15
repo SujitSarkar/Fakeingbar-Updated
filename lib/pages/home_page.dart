@@ -7,6 +7,7 @@ import 'package:fakeingbar/data/sharedpreference/sharepreferenceController.dart'
 import 'package:fakeingbar/models/friend_list_model.dart';
 import 'package:fakeingbar/models/trainer_chat_model.dart';
 import 'package:fakeingbar/pages/profile_page.dart';
+import 'package:fakeingbar/pages/trainer_page.dart';
 import 'package:fakeingbar/pages/userday_toggol_page.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:fakeingbar/widgets/k_chat_dialog.dart';
@@ -351,34 +352,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(width: MediaQuery.of(context).size.width * .035),
               GestureDetector(
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return GetBuilder<DatabaseController>(
-                        builder: (_databaseController) {
-                          return KChatDialog(
-                            name: "Trainer",
-                            firstText: _sendMsgController,
-                            secondText: _replyMsgController,
-                            hintText1: "Write Send Message",
-                            hintText2: "Write Reply Message",
-                            btnText: "Save",
-                            onPressed: () async {
-                              await _databaseController.insertTrainerChat(
-                                TrainerChatModel(
-                                  question: _sendMsgController.text.trim(),
-                                  answer: _replyMsgController.text.trim(),
-                                ),
-                              );
-                              _sendMsgController.clear();
-                              _replyMsgController.clear();
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                      );
-                    },
-                  );
+                  Get.to(() => TrainerPage());
                 },
                 child: Container(
                   padding: EdgeInsets.all(customWidth(.018)),

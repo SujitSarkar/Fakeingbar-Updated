@@ -25,4 +25,13 @@ class TrainerChatModel {
     question = map['question'];
     answer = map["answer"];
   }
+  TrainerChatModel copyWith({
+    String? question,
+    String? answer,
+  }) {
+    return TrainerChatModel(
+      question: question ?? this.question,
+      answer: answer ?? this.answer,
+    );
+  }
 }
