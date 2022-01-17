@@ -202,35 +202,6 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  Future<dynamic> showEditChatDialog(DatabaseController _databaseController) {
-    return showDialog(
-      context: context,
-      builder: (context) => KChatDialog(
-        firstText: _welcomeMsgController,
-        secondText: _addressController,
-        name: "Edit Chat",
-        hintText1: _databaseController.currentUser.value.welcomeMessage!,
-        hintText2: _databaseController.currentUser.value.address!,
-        btnText: "Save",
-        onPressed: () async {
-          await _databaseController.updateUser(
-              _databaseController.currentUser.value.copyWith(
-                welcomeMessage: _welcomeMsgController.text.trim().isNotEmpty
-                    ? _welcomeMsgController.text.trim()
-                    : _databaseController.currentUser.value.welcomeMessage,
-                address: _addressController.text.trim().isNotEmpty
-                    ? _addressController.text.trim()
-                    : _databaseController.currentUser.value.address,
-              ),
-              userId);
-
-          _databaseController.updateCurrentUser(userId);
-          Navigator.pop(context);
-        },
-      ),
-    );
-  }
-
   _buildAppBar() {
     return GetBuilder<DatabaseController>(
       builder: (_databaseController) {
@@ -552,5 +523,34 @@ class _ChatState extends State<Chat> {
             },
           );
         });
+  }
+
+  Future<dynamic> showEditChatDialog(DatabaseController _databaseController) {
+    return showDialog(
+      context: context,
+      builder: (context) => KChatDialog(
+        firstText: _welcomeMsgController,
+        secondText: _addressController,
+        name: "Edit Chat",
+        hintText1: _databaseController.currentUser.value.welcomeMessage!,
+        hintText2: _databaseController.currentUser.value.address!,
+        btnText: "Save",
+        onPressed: () async {
+          await _databaseController.updateUser(
+              _databaseController.currentUser.value.copyWith(
+                welcomeMessage: _welcomeMsgController.text.trim().isNotEmpty
+                    ? _welcomeMsgController.text.trim()
+                    : _databaseController.currentUser.value.welcomeMessage,
+                address: _addressController.text.trim().isNotEmpty
+                    ? _addressController.text.trim()
+                    : _databaseController.currentUser.value.address,
+              ),
+              userId);
+
+          _databaseController.updateCurrentUser(userId);
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 }

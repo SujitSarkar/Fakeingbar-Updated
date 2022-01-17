@@ -103,7 +103,7 @@ class _ChatBubbleState extends State<ChatBubble> {
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 4.0,
-                vertical: 2.0,
+                // vertical: 2.0,
               ),
               child: GestureDetector(
                 onLongPress: () {
@@ -111,7 +111,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                   _editingController.text = chat.value.sendMessage!;
                 },
                 child: Row(
-                  mainAxisAlignment: chat.value.isReceived == "dateTime"
+                  mainAxisAlignment: chat.value.messageType == "dateTime"
                       ? MainAxisAlignment.center
                       : MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -124,17 +124,15 @@ class _ChatBubbleState extends State<ChatBubble> {
                               chat.value.sendMessage!,
                               textWidthBasis: TextWidthBasis.longestLine,
                               style: TextStyle(
-                                fontSize: 12.0,
+                                fontSize: 14.0,
                                 color: _themeController.darkenTextColor,
-                                fontWeight: FontWeight.w400,
-                                height: 1,
                               ),
                             ),
                           )
-                        //remove message
                         : Column(
                             children: [
                               chat.value.sendMessage! == removeStr
+                                  //remove message
                                   ? Container(
                                       alignment: Alignment.center,
                                       padding: EdgeInsets.symmetric(
@@ -260,49 +258,11 @@ class _ChatBubbleState extends State<ChatBubble> {
                                         )
                                       //image...
                                       : chat.value.messageType == "image"
-                                          ? Row(
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.all(
-                                                      customWidth(.02)),
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color:
-                                                        SThemeData.chatColors[
-                                                            widget.user.value
-                                                                .chatColor!],
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.share,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: customWidth(.02),
-                                                ),
-                                                Container(
-                                                    width: customWidth(.6),
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      vertical:
-                                                          customWidth(.02),
-                                                      horizontal:
-                                                          customWidth(.02),
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          SThemeData.chatColors[
-                                                              widget.user.value
-                                                                  .chatColor!],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                        customWidth(.04),
-                                                      ),
-                                                    ),
-                                                    child: Image.file(File(chat
-                                                        .value.sendMessage!))),
-                                              ],
+                                          ? ImageMessage(
+                                              themeController: _themeController,
+                                              chat: chat,
                                             )
+                                          //Text message
                                           : Container(
                                               alignment: Alignment.center,
                                               padding: EdgeInsets.symmetric(
@@ -319,7 +279,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                                               ),
                                               child: Container(
                                                 constraints: BoxConstraints(
-                                                    maxWidth: customWidth(.5)),
+                                                    maxWidth: customWidth(.6)),
                                                 child: Text(
                                                   chat.value.sendMessage!,
                                                   textWidthBasis: TextWidthBasis
@@ -358,65 +318,53 @@ class _ChatBubbleState extends State<ChatBubble> {
                                                     ))
                                               ],
                                             )
-                                          : SizedBox(
-                                              height: customWidth(.05),
-                                            )
-                                      : SizedBox(
-                                          height: customWidth(.05),
-                                        )
-                                  : SizedBox(
-                                      height: customWidth(.05),
-                                    ),
+                                          : const SizedBox()
+                                      : const SizedBox()
+                                  : const SizedBox(),
                             ],
                           ),
                     const SizedBox(width: 12.0),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        widget.chatIndex == 0
-                            ? chat.value.isReceived == "not send"
+                    widget.chatIndex == 0
+                        ? chat.value.isReceived == "not send"
+                            ? Icon(
+                                Icons.circle_outlined,
+                                color: SThemeData
+                                    .chatColors[widget.user.value.chatColor!],
+                                size: customWidth(.05),
+                              )
+                            : chat.value.isReceived == "not received"
                                 ? Icon(
-                                    Icons.circle_outlined,
-                                    color: SThemeData.chatColors[
-                                        widget.user.value.chatColor!],
+                                    Icons.check_circle_outline,
+                                    color: _themeController.darkenTextColor,
                                     size: customWidth(.05),
                                   )
-                                : chat.value.isReceived == "not received"
+                                : chat.value.isReceived == "received"
                                     ? Icon(
-                                        Icons.check_circle_outline,
+                                        Icons.check_circle,
                                         color: _themeController.darkenTextColor,
                                         size: customWidth(.05),
                                       )
-                                    : chat.value.isReceived == "received"
-                                        ? Icon(
-                                            Icons.check_circle,
-                                            color: _themeController
-                                                .darkenTextColor,
-                                            size: customWidth(.05),
-                                          )
-                                        : chat.value.isReceived == "seen"
-                                            ? widget.user.value.hasGroup!
-                                                ? SizedBox(
-                                                    width: customWidth(.05),
-                                                  )
-                                                : SizedBox(
-                                                    width: customWidth(.04),
-                                                    height: customWidth(.04),
-                                                    child: CustomeCircleAvatar(
-                                                      user: widget.user.value,
-                                                      onlineDotSize: 0,
-                                                      showDay: false,
-                                                    ),
-                                                  )
-                                            : const SizedBox()
-                            : SizedBox(
-                                width: customWidth(.05),
-                              ),
-                        SizedBox(
-                          height: customWidth(.052),
+                                    : chat.value.isReceived == "seen"
+                                        ? widget.user.value.hasGroup!
+                                            ? SizedBox(
+                                                width: customWidth(.05),
+                                              )
+                                            : SizedBox(
+                                                width: customWidth(.04),
+                                                height: customWidth(.04),
+                                                child: CustomeCircleAvatar(
+                                                  user: widget.user.value,
+                                                  onlineDotSize: 0,
+                                                  showDay: false,
+                                                ),
+                                              )
+                                        : const SizedBox()
+                        : SizedBox(
+                            width: customWidth(.05),
+                          ),
+                    const SizedBox(
+                        // height: customWidth(.052),
                         ),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -751,6 +699,75 @@ class _ChatBubbleState extends State<ChatBubble> {
           );
         },
       ),
+    );
+  }
+}
+
+class ImageMessage extends StatelessWidget {
+  const ImageMessage({
+    Key? key,
+    required ThemeController themeController,
+    required this.chat,
+  })  : _themeController = themeController,
+        super(key: key);
+
+  final ThemeController _themeController;
+  final Rx<ChatListModel> chat;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        //Right Side Buttons
+        Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(customWidth(.018)),
+              decoration: BoxDecoration(
+                color: _themeController.backgroundColor,
+                borderRadius: BorderRadius.circular(customWidth(.06)),
+              ),
+              child: Icon(
+                Icons.share,
+                size: 20,
+                color: _themeController.textColor,
+              ),
+            ),
+            SizedBox(
+              height: customWidth(.05),
+            ),
+            Container(
+              padding: EdgeInsets.all(customWidth(.018)),
+              decoration: BoxDecoration(
+                color: _themeController.backgroundColor,
+                borderRadius: BorderRadius.circular(customWidth(.06)),
+              ),
+              child: Icon(
+                Icons.camera_alt,
+                size: 20,
+                color: _themeController.textColor,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          width: customWidth(.025),
+        ),
+        Container(
+            // width: customWidth(.5),
+            constraints: BoxConstraints(
+              maxHeight: customWidth(.8),
+              maxWidth: customWidth(.65),
+            ),
+            decoration: BoxDecoration(
+              color: _themeController.backgroundColor,
+              borderRadius: BorderRadius.circular(
+                customWidth(.04),
+              ),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: Image.file(File(chat.value.sendMessage!))),
+      ],
     );
   }
 }
