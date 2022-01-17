@@ -114,109 +114,114 @@ class ChatAppBarAction extends StatelessWidget {
                         ))
                   ],
                 ),
-                const SizedBox(
-                  width: 10.0,
-                ),
               ],
             ),
             Expanded(
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Obx(
-                      () => _databaseController.currentUser.value.isBlock! ==
-                              false
-                          ? InkWell(
-                              onTap: () {
-                                Get.to(() => AudioCall(
-                                      user: db.currentUser.value,
-                                    ));
-                              },
-                              child: Icon(
-                                FontAwesomeIcons.phoneAlt,
-                                color: SThemeData.chatColors[_databaseController
-                                    .currentUser.value.chatColor!],
-                                size: 20.0,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Obx(
+                    () =>
+                        _databaseController.currentUser.value.isBlock! == false
+                            ? InkWell(
+                                onTap: () {
+                                  Get.to(() => AudioCall(
+                                        user: db.currentUser.value,
+                                      ));
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.phoneAlt,
+                                  color: SThemeData.chatColors[
+                                      _databaseController
+                                          .currentUser.value.chatColor!],
+                                  size: 20.0,
+                                ),
+                              )
+                            : Container(
+                                width: customWidth(.08),
                               ),
-                            )
-                          : Container(
-                              width: customWidth(.08),
-                            ),
-                    ),
-                    Obx(
-                      () => isBlock.isFalse
-                          ? Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    Get.to(() => VideoCallPage(
-                                          user: _databaseController
-                                              .currentUser.value,
-                                        ));
-                                  },
-                                  child: Icon(
-                                    FontAwesomeIcons.video,
-                                    color: SThemeData.chatColors[
-                                        _databaseController
-                                            .currentUser.value.chatColor!],
-                                    size: 20.0,
-                                  ),
+                  ),
+                  SizedBox(
+                    width: customWidth(.09),
+                  ),
+                  Obx(
+                    () => isBlock.isFalse
+                        ? Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Get.to(() => VideoCallPage(
+                                        user: _databaseController
+                                            .currentUser.value,
+                                      ));
+                                },
+                                child: Icon(
+                                  FontAwesomeIcons.video,
+                                  color: SThemeData.chatColors[
+                                      _databaseController
+                                          .currentUser.value.chatColor!],
+                                  size: 20.0,
                                 ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * .008,
-                                ),
-                                _databaseController
-                                            .currentUser.value.isOnline ==
-                                        false
-                                    ? Container(
-                                        width: 13.0,
-                                        height: 13.0,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xff4DC82C),
-                                          border: Border.all(
-                                            width: 3.0,
-                                            color: _themeController
-                                                .scaffoldBackgroundColor,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * .008,
+                              ),
+                              _databaseController.currentUser.value.isOnline ==
+                                      false
+                                  ? Container(
+                                      width: 13.0,
+                                      height: 13.0,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xff4DC82C),
+                                        border: Border.all(
+                                          width: 3.0,
+                                          color: _themeController
+                                              .scaffoldBackgroundColor,
                                         ),
-                                      )
-                                    : const SizedBox(
-                                        width: 13.0,
-                                        height: 13.0,
-                                      )
-                              ],
-                            )
-                          : Container(
-                              width: customWidth(.08),
-                            ),
-                    ),
-                    PopupMenuButton<int>(
-                      key: _key,
-                      itemBuilder: (context) {
-                        return [
-                          ...List.generate(
-                            chatSetting.length,
-                            (index) => PopupMenuItem(
-                              value: index,
-                              child: Text(chatSetting[index]),
-                            ),
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                      ),
+                                    )
+                                  : const SizedBox(
+                                      width: 13.0,
+                                      height: 13.0,
+                                    )
+                            ],
                           )
-                        ];
-                      },
-                      onSelected: (value) {
-                        _menuIndexedFunction(
-                            context, value, _databaseController);
-                      },
-                      child: Icon(
-                        Icons.info_rounded,
-                        color: color,
-                        size: 25.0,
-                      ),
+                        : Container(
+                            width: customWidth(.08),
+                          ),
+                  ),
+                  SizedBox(
+                    width: customWidth(.04),
+                  ),
+                  PopupMenuButton<int>(
+                    key: _key,
+                    itemBuilder: (context) {
+                      return [
+                        ...List.generate(
+                          chatSetting.length,
+                          (index) => PopupMenuItem(
+                            value: index,
+                            child: Text(chatSetting[index]),
+                          ),
+                        )
+                      ];
+                    },
+                    onSelected: (value) {
+                      _menuIndexedFunction(context, value, _databaseController);
+                    },
+                    child: Icon(
+                      Icons.info_rounded,
+                      color: color,
+                      size: 25.0,
                     ),
-                  ]),
+                  ),
+                  SizedBox(
+                    width: customWidth(.04),
+                  ),
+                ],
+              ),
             )
           ],
         ),

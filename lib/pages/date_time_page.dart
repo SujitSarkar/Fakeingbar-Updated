@@ -18,7 +18,8 @@ class _DateTimePageState extends State<DateTimePage> {
   final TextEditingController _dateTimeController = TextEditingController();
   int _radioSelected = 0;
 
-  final _showDate = false.obs;
+  final _showYear = false.obs;
+  final _showMonth = false.obs;
   final _showTime = false.obs;
   bool _is24Hour = false;
 
@@ -34,9 +35,11 @@ class _DateTimePageState extends State<DateTimePage> {
     String formatedTime = _showTime.isTrue
         ? DateFormat(_is24Hour ? "HH:mm:ss" : "h:mm a").format(tempTime)
         : "";
-    String formatedDate =
-        _showDate.isTrue ? DateFormat('yMMMd').format(_date) + " AT " : "";
-    _dateTimeController.text = "$formatedDate $formatedTime";
+    String formatedMonth =
+        _showMonth.isTrue ? DateFormat('MMMd').format(_date) + " AT " : "";
+    String formatedYear =
+        _showYear.isTrue ? DateFormat('y').format(_date) + ", " : "";
+    _dateTimeController.text = "$formatedYear $formatedMonth $formatedTime";
     return GetBuilder<DatabaseController>(
       builder: (_databaseController) {
         userId = _databaseController.currentUser.value.id!;
@@ -66,7 +69,8 @@ class _DateTimePageState extends State<DateTimePage> {
                           onChanged: (value) {
                             setState(() {
                               _radioSelected = value!;
-                              _showDate.value = false;
+                              _showYear.value = false;
+                              _showMonth.value = false;
                               _showTime.value = true;
                             });
                           },
@@ -80,7 +84,8 @@ class _DateTimePageState extends State<DateTimePage> {
                           onChanged: (value) {
                             setState(() {
                               _radioSelected = value!;
-                              _showDate.value = true;
+                              _showYear.value = false;
+                              _showMonth.value = true;
                               _showTime.value = true;
                             });
                           },
@@ -94,7 +99,8 @@ class _DateTimePageState extends State<DateTimePage> {
                           onChanged: (value) {
                             setState(() {
                               _radioSelected = value!;
-                              _showDate.value = true;
+                              _showYear.value = true;
+                              _showMonth.value = true;
                               _showTime.value = true;
                             });
                           },
@@ -135,7 +141,7 @@ class _DateTimePageState extends State<DateTimePage> {
                               : Container(),
                         ),
                         Obx(
-                          () => _showDate.isTrue
+                          () => _showMonth.isTrue || _showYear.isTrue
                               ? Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
@@ -173,8 +179,8 @@ class _DateTimePageState extends State<DateTimePage> {
                         KFilledButton(
                           text: "Save",
                           btnColor: SThemeData.blueDotColor,
-                          onPressed: () {
-                            _databaseController.insertChat(
+                          onPressed: () async {
+                            await _databaseController.insertChat(
                               ChatListModel(
                                 friendListID: userId,
                                 sendMessage: _dateTimeController.text.trim(),
@@ -182,20 +188,11 @@ class _DateTimePageState extends State<DateTimePage> {
                                 receiveMessage: "",
                                 senderTime: DateTime.now(),
                                 receiveTime: DateTime.now(),
-                                isReceived: "dateTime",
+                                isReceived: "",
+                                messageType: "dateTime",
                               ),
                             );
-                            _databaseController.currentUserChats.add(
-                              ChatListModel(
-                                friendListID: userId,
-                                sendMessage: _dateTimeController.text.trim(),
-                                memberID: "",
-                                receiveMessage: "",
-                                senderTime: DateTime.now(),
-                                receiveTime: DateTime.now(),
-                                isReceived: "dateTime",
-                              ),
-                            );
+                            _databaseController.updateCurrentUser(userId);
                             Navigator.pop(context);
                           },
                         ),

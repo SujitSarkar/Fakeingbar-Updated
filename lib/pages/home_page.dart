@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_screen_recorder/device_screen_recorder.dart';
 import 'package:fakeingbar/config.dart';
 import 'package:fakeingbar/controller/theme_controller.dart';
 import 'package:fakeingbar/data/local_database.dart/database_controller.dart';
@@ -47,6 +48,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  bool recording = false;
+  String path = '';
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<DatabaseController>(
@@ -67,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                       Center(
                         child: ElevatedButton(
                           onPressed: () => _themeController.toggleThemeData(),
-                          child: const Text('Change Theme'),
+                          child: const Text("Change Theme"),
                         ),
                       ),
                       ListView.builder(
@@ -289,6 +293,42 @@ class _HomePageState extends State<HomePage> {
         },
       );
 
+  Future<void> stopRecording() async {
+    var file = await DeviceScreenRecorder.stopRecordScreen();
+    setState(() {
+      path = file ?? '';
+      recording = false;
+    });
+    Get.snackbar(
+      "Recording Complete",
+      "Recording save to $path",
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 5),
+      margin: const EdgeInsets.only(
+        bottom: 10,
+        right: 10,
+        left: 10,
+      ),
+      backgroundColor: _themeController.chatBGColor,
+      borderColor: _themeController.backgroundColor,
+      borderWidth: 1,
+      dismissDirection: DismissDirection.up,
+      icon: const Icon(Icons.video_collection),
+      shouldIconPulse: true,
+      barBlur: 20,
+      isDismissible: true,
+      forwardAnimationCurve: Curves.easeOutBack,
+    );
+  }
+
+  Future<void> startRecording() async {
+    var status = await DeviceScreenRecorder.startRecordScreen();
+    // var status = await ScreenRecorder.startRecordScreen(name: 'example');
+    setState(() {
+      recording = status ?? false;
+    });
+  }
+
   Row _appbarSection(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -343,10 +383,15 @@ class _HomePageState extends State<HomePage> {
                   color: _themeController.backgroundColor,
                   borderRadius: BorderRadius.circular(customWidth(.06)),
                 ),
-                child: Icon(
-                  Icons.camera_alt,
-                  size: 20,
-                  color: _themeController.textColor,
+                child: GestureDetector(
+                  onTap: () async {
+                    recording ? await stopRecording() : await startRecording();
+                  },
+                  child: Icon(
+                    Icons.camera_alt,
+                    size: 20,
+                    color: _themeController.textColor,
+                  ),
                 ),
               ),
               SizedBox(width: MediaQuery.of(context).size.width * .035),
