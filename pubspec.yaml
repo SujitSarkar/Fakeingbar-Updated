@@ -20,8 +20,8 @@ dependencies:
   permission_handler: ^8.3.0
   flutter_contacts: ^1.1.1+2
   flutter_svg: ^1.0.0
-  scrollable_positioned_list: ^0.2.3
   device_screen_recorder: ^0.0.1
+  dart_emoji: ^0.2.0+1
 
 dev_dependencies:
   flutter_test:

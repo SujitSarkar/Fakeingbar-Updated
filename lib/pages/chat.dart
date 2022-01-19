@@ -10,6 +10,7 @@ import 'package:fakeingbar/widgets/chat_appbar.dart';
 import 'package:fakeingbar/widgets/chat_bubble.dart';
 import 'package:fakeingbar/widgets/custom_circle_avatar.dart';
 import 'package:fakeingbar/widgets/k_chat_dialog.dart';
+import 'package:fakeingbar/widgets/k_dialog.dart';
 import 'package:fakeingbar/widgets/k_filled_button.dart';
 import 'package:fakeingbar/widgets/k_voice_msg_sending_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class Chat extends StatefulWidget {
   const Chat({
@@ -30,8 +30,6 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   final ThemeController _themeController = Get.find();
-
-  List<String> chatSetting = [];
 
   final ScrollController _scrollController = ScrollController();
   // final ItemScrollController _itemScrollController = ItemScrollController();
@@ -46,15 +44,10 @@ class _ChatState extends State<Chat> {
 
   List<GroupUserListModel> groupMembers = [];
   String memberID = '';
+  RxString block = "Block".obs;
 
   @override
   void initState() {
-    chatSetting = [
-      "Block",
-      "Set Profile Picture",
-      "Add Date/Time",
-      "Chat Settings",
-    ];
     // _animateToIndex(0);
     // scrollDown();
 
@@ -63,26 +56,35 @@ class _ChatState extends State<Chat> {
     super.initState();
   }
 
+  FocusNode ftext = FocusNode();
+
+  @override
+  void dispose() {
+    ftext.dispose();
+    super.dispose();
+  }
+
   scrollDown() {
     final double end = _scrollController.position.maxScrollExtent + 500;
     _scrollController.animateTo(end,
-        duration: const Duration(microseconds: 1), curve: Curves.easeOut);
+        duration: const Duration(microseconds: 1), curve: Curves.bounceOut);
   }
 
-  // void _animateToIndex(int index) {
-  //   _scrollController.animateToItem(index,
-  //       duration: const Duration(milliseconds: 600), curve: Curves.linear);
-  // }
+  final RxBool _isfocus = true.obs;
 
-  // void _scrollToIndex(int index) {
-  //   _itemScrollController.scrollTo(
-  //       index: index,
-  //       duration: Duration(seconds: 2),
-  //       curve: Curves.easeInOutCubic);
-  // }
+  _autoUnfocus() {
+    if (MediaQuery.of(context).viewInsets.bottom == 0) {
+      ftext.unfocus();
+      _isfocus(false);
+    } else {
+      scrollDown();
+      _isfocus(true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    _autoUnfocus();
     return GetBuilder<DatabaseController>(
       builder: (_databaseController) {
         print("ChatList: ${_databaseController.currentUserChats}");
@@ -92,6 +94,9 @@ class _ChatState extends State<Chat> {
               .where((g) =>
                   g.friendListID == _databaseController.currentUser.value.id!)
               .toList();
+        }
+        if (_databaseController.currentUser.value.isBlock == true) {
+          block("Unblock");
         }
 
         return WillPopScope(
@@ -121,80 +126,89 @@ class _ChatState extends State<Chat> {
           child: SingleChildScrollView(
             controller: _scrollController,
             physics: const ClampingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                CustomeCircleAvatar(
-                  user: _databaseController.currentUser.value,
-                  picRadius: 50,
-                  onlineDotSize: 0,
-                ),
-                SizedBox(
-                  height: customWidth(.03),
-                ),
-                Text(
-                  _databaseController.currentUser.value.name!,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: customWidth(.065),
-                    color: _themeController.textColor,
+            child: GestureDetector(
+              onTap: () {
+                if (ftext.hasFocus) {
+                  ftext.unfocus();
+                }
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CustomeCircleAvatar(
+                    user: _databaseController.currentUser.value,
+                    picRadius: 50,
+                    onlineDotSize: 0,
                   ),
-                ),
-                SizedBox(
-                  height: customWidth(.015),
-                ),
-                !_databaseController.currentUser.value.hasGroup!
-                    ? GestureDetector(
-                        onTap: () {
-                          showEditChatDialog(_databaseController);
-                        },
-                        child: Text(
-                          _databaseController.currentUser.value.welcomeMessage!,
-                          style: TextStyle(
-                            color: _themeController.textColor,
+                  SizedBox(
+                    height: customWidth(.03),
+                  ),
+                  Text(
+                    _databaseController.currentUser.value.name!,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: customWidth(.065),
+                      color: _themeController.textColor,
+                    ),
+                  ),
+                  SizedBox(
+                    height: customWidth(.015),
+                  ),
+                  !_databaseController.currentUser.value.hasGroup!
+                      ? GestureDetector(
+                          onTap: () {
+                            showEditChatDialog(_databaseController);
+                          },
+                          child: Text(
+                            _databaseController
+                                .currentUser.value.welcomeMessage!,
+                            style: TextStyle(
+                              color: _themeController.textColor,
+                            ),
                           ),
-                        ),
-                      )
-                    : const SizedBox(),
-                SizedBox(
-                  height: customWidth(.015),
-                ),
-                !_databaseController.currentUser.value.hasGroup!
-                    ? GestureDetector(
-                        onTap: () => showEditChatDialog(_databaseController),
-                        child: Text(
-                          "Lives in ${_databaseController.currentUser.value.address}",
-                          style: TextStyle(
-                            color: _themeController.darkenTextColor,
+                        )
+                      : const SizedBox(),
+                  SizedBox(
+                    height: customWidth(.015),
+                  ),
+                  !_databaseController.currentUser.value.hasGroup!
+                      ? GestureDetector(
+                          onTap: () => showEditChatDialog(_databaseController),
+                          child: Text(
+                            "Lives in ${_databaseController.currentUser.value.address}",
+                            style: TextStyle(
+                              color: _themeController.darkenTextColor,
+                            ),
                           ),
-                        ),
-                      )
-                    : const SizedBox(),
-                SizedBox(
-                  height: customWidth(.03),
-                ),
-                Obx(
-                  () => ListView.builder(
-                    reverse: true,
-                    shrinkWrap: true,
-                    // itemScrollController: _itemScrollController,
+                        )
+                      : const SizedBox(),
+                  SizedBox(
+                    height: customWidth(.03),
+                  ),
+                  Obx(
+                    () => ListView.builder(
+                      reverse: true,
+                      shrinkWrap: true,
+                      // itemScrollController: _itemScrollController,
 
-                    physics: const ClampingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      print("new: $index old: ${_databaseController.isNew}");
-                      print("Member id.........: $memberID ");
-                      return ChatBubble(
-                        // chatList: _databaseController.currentUserChats[index],
-                        chatId: _databaseController.currentUserChats[index].id!,
-                        user: _databaseController.currentUser,
-                        chatIndex: index,
-                      );
-                    },
-                    itemCount: _databaseController.currentUserChats.length,
+                      physics: const ClampingScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        print("new: $index old: ${_databaseController.isNew}");
+                        print("Member id.........: $memberID ");
+                        return ChatBubble(
+                          // chatList: _databaseController.currentUserChats[index],
+                          chatId:
+                              _databaseController.currentUserChats[index].id!,
+                          user: _databaseController.currentUser,
+                          chatIndex: index,
+                        );
+                      },
+                      itemCount: _databaseController.currentUserChats.length,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -205,20 +219,27 @@ class _ChatState extends State<Chat> {
   _buildAppBar() {
     return GetBuilder<DatabaseController>(
       builder: (_databaseController) {
-        return ChatAppBarAction(
-          isBack: true,
-          isOnline: _databaseController.currentUser.value.isOnline!,
-          title: _databaseController
-              .currentUser.value.name!, //widget.friendItem!.name,
-          imageUrl: _databaseController
-              .currentUser.value.imageUrl!, //widget.friendItem!.imageAvatarUrl,
-          subTitle: _databaseController.currentUser.value.isOnline == true
-              ? 'Active now'
-              : _databaseController.currentUser.value.inactiveTime != null
-                  ? "Active ${_databaseController.currentUser.value.inactiveTime}"
-                  : "offline",
-          color: SThemeData
-              .chatColors[_databaseController.currentUser.value.chatColor!],
+        return GestureDetector(
+          onTap: () {
+            if (ftext.hasFocus) {
+              ftext.unfocus();
+            }
+          },
+          child: ChatAppBarAction(
+            isBack: true,
+            isOnline: _databaseController.currentUser.value.isOnline!,
+            title: _databaseController
+                .currentUser.value.name!, //widget.friendItem!.name,
+            imageUrl: _databaseController.currentUser.value
+                .imageUrl!, //widget.friendItem!.imageAvatarUrl,
+            subTitle: _databaseController.currentUser.value.isOnline == true
+                ? 'Active now'
+                : _databaseController.currentUser.value.inactiveTime != null
+                    ? "Active ${_databaseController.currentUser.value.inactiveTime}"
+                    : "offline",
+            color: SThemeData
+                .chatColors[_databaseController.currentUser.value.chatColor!],
+          ),
         );
       },
     );
@@ -230,73 +251,101 @@ class _ChatState extends State<Chat> {
         return _databaseController.currentUser.value.isBlock == false
             ? Container(
                 decoration: BoxDecoration(
-                  color: _themeController.scaffoldBackgroundColor,
+                    color: _themeController.scaffoldBackgroundColor,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 1,
+                        offset: Offset(0, -1),
+                        spreadRadius: .5,
+                      )
+                    ]),
+                padding: EdgeInsets.only(
+                  top: 5.0,
+                  bottom: MediaQuery.of(context).viewInsets.bottom == 0
+                      ? customWidth(.06)
+                      : customWidth(.02),
+                  left: 10,
                 ),
-                padding:
-                    const EdgeInsets.only(top: 5.0, bottom: 10.0, left: 10),
                 child: Row(
                   children: <Widget>[
                     Container(
-                      height: 20.0,
-                      width: 22.0,
-                      decoration: const BoxDecoration(
-                          //borderRadius: BorderRadius.circular(20.0),
-                          // image: DecorationImage(
-                          //   image: AssetImage('images/noun_menu.png'),
-                          //   fit: BoxFit.cover,
-                          // ),
-                          ),
-                      child: SvgPicture.asset(
-                        'assets/svg/image2vector.svg',
-                        fit: BoxFit.scaleDown,
-                        color: SThemeData.chatColors[
-                            _databaseController.currentUser.value.chatColor!],
+                      padding: EdgeInsets.only(
+                        left: customWidth(.02),
+                        right: ftext.hasFocus ? customWidth(.02) : 0,
                       ),
-                    ),
-                    Expanded(
-                      flex: 40,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.camera,
-                            size: 20.0,
-                            color: SThemeData.chatColors[_databaseController
-                                .currentUser.value.chatColor!],
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              await getImageForMessage(_databaseController);
-                            },
-                            child: Icon(
-                              CupertinoIcons.photo,
-                              size: 20.0,
+                      child: _isfocus.isTrue
+                          ? Icon(
+                              Icons.arrow_forward_ios,
+                              color: SThemeData.chatColors[_databaseController
+                                  .currentUser.value.chatColor!],
+                              size: customWidth(.06),
+                            )
+                          : SvgPicture.asset(
+                              'assets/svg/image2vector.svg',
+                              fit: BoxFit.scaleDown,
+                              height: customWidth(.06),
+                              width: customWidth(.06),
                               color: SThemeData.chatColors[_databaseController
                                   .currentUser.value.chatColor!],
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () => _showVoiceMessageDialog(),
-                            child: Icon(
-                              CupertinoIcons.mic_solid,
-                              size: 20.0,
-                              color: SThemeData.chatColors[_databaseController
-                                  .currentUser.value.chatColor!],
+                    ),
+                    _isfocus.isTrue
+                        ? const SizedBox()
+                        : Expanded(
+                            flex: 40,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Icon(
+                                  FontAwesomeIcons.camera,
+                                  size: 20.0,
+                                  color: SThemeData.chatColors[
+                                      _databaseController
+                                          .currentUser.value.chatColor!],
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await getImageForMessage(
+                                        _databaseController);
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.photo,
+                                    size: 20.0,
+                                    color: SThemeData.chatColors[
+                                        _databaseController
+                                            .currentUser.value.chatColor!],
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => _showVoiceMessageDialog(),
+                                  child: Icon(
+                                    CupertinoIcons.mic_solid,
+                                    size: 20.0,
+                                    color: SThemeData.chatColors[
+                                        _databaseController
+                                            .currentUser.value.chatColor!],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                    //text field
                     Expanded(
                       flex: 50,
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width - 40,
                         height: MediaQuery.of(context).size.width * .11,
                         child: TextField(
+                          focusNode: ftext,
+                          autofocus: false,
                           controller: _textEditingController,
                           onChanged: (value) {
                             _textBox(value);
                           },
+                          onTap: () async => await Future.delayed(
+                                  const Duration(milliseconds: 2005))
+                              .then((_) => scrollDown()),
                           decoration: InputDecoration(
                               contentPadding: const EdgeInsets.all(10.0),
                               border: OutlineInputBorder(
@@ -322,105 +371,90 @@ class _ChatState extends State<Chat> {
                     ),
                     //Send Button
                     Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: customWidth(0.03)),
+                      padding: EdgeInsets.only(
+                        right: customWidth(0.03),
+                        left: customWidth(0.03),
+                      ),
                       child: GestureDetector(
                         onTap: () async {
-                          if (_textBox.isNotEmpty &&
-                              _textEditingController.text.trim().isNotEmpty) {
-                            if (!DateTime.now().isBlank!) {
-                              if (_databaseController
-                                  .currentUser.value.hasGroup!) {
-                                await showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Dialog(
-                                        child: IntrinsicHeight(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0,
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                ...groupMembers.map((group) {
-                                                  return ListTile(
-                                                    leading: CircleAvatar(
-                                                      backgroundImage:
-                                                          FileImage(File(
-                                                              group.imageUrl!)),
-                                                    ),
-                                                    title: Text(group.name!),
-                                                    onTap: () => setState(() {
-                                                      memberID =
-                                                          group.id!.toString();
-                                                      Navigator.pop(context);
-                                                    }),
-                                                  );
-                                                }),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    });
+                          RxBool isThumup = false.obs;
+                          if (_textBox.isEmpty &&
+                              _textEditingController.text.trim().isEmpty) {
+                            isThumup(true);
+                          }
+                          if (!DateTime.now().isBlank!) {
+                            if (_databaseController
+                                .currentUser.value.hasGroup!) {
+                              await _hasGroup(_databaseController);
+                              if (memberID.trim().isEmpty) {
+                                return;
                               }
-                              String reply =
-                                  "Don't understand what you say!!😒";
-
-                              for (var chat
-                                  in _databaseController.trainerChatList) {
-                                if (chat.question ==
-                                    _textEditingController.text.trim()) {
-                                  print(
-                                      "question: ${chat.question}, answer: ${chat.answer}");
-                                  reply = chat.answer!;
-                                }
-                              }
-                              await _databaseController.insertChat(
-                                  ChatListModel(
-                                      friendListID: _databaseController
-                                          .currentUser.value.id,
-                                      sendMessage:
-                                          _textEditingController.text.trim(),
-                                      memberID: memberID,
-                                      messageType: "text",
-                                      receiveMessage: reply,
-                                      senderTime: DateTime.now(),
-                                      receiveTime: DateTime.now(),
-                                      isReceived: "received"));
-                              await _databaseController.updateUser(
-                                _databaseController.currentUser.value.copyWith(
-                                    lastMessage:
-                                        _textEditingController.text.trim(),
-                                    lastMessageTime: DateTime.now()),
-                                _databaseController.currentUser.value.id!,
-                              );
-                              _databaseController.updateCurrentUser(userId);
-
-                              _textBox.value = '';
-                              _textEditingController.clear();
-
-                              _databaseController.isNew(true);
-                              // _scrollToIndex(
-                              //     _databaseController.currentUserChats.length +
-                              //         1);
-                              scrollDown();
-
-                              await Future.delayed(
-                                      const Duration(milliseconds: 2005))
-                                  .then((_) => scrollDown());
                             }
+                            String reply = "Don't understand what you say!!😒";
+
+                            for (var chat
+                                in _databaseController.trainerChatList) {
+                              if (chat.question ==
+                                  _textEditingController.text.trim()) {
+                                print(
+                                    "question: ${chat.question}, answer: ${chat.answer}");
+                                reply = chat.answer!;
+                              }
+                            }
+                            await _databaseController.insertChat(ChatListModel(
+                                friendListID:
+                                    _databaseController.currentUser.value.id,
+                                sendMessage: _textEditingController.text.trim(),
+                                memberID: memberID,
+                                messageType:
+                                    isThumup.isTrue ? "thumsUp" : "text",
+                                receiveMessage: reply,
+                                senderTime: DateTime.now(),
+                                receiveTime: DateTime.now(),
+                                isReceived: "received"));
+                            await _databaseController.updateUser(
+                              _databaseController.currentUser.value.copyWith(
+                                  lastMessage: isThumup.isTrue
+                                      ? "👍"
+                                      : _textEditingController.text.trim(),
+                                  lastMessageTime: DateTime.now()),
+                              _databaseController.currentUser.value.id!,
+                            );
+                            _databaseController.updateCurrentUser(userId);
+
+                            _textBox.value = '';
+                            _textEditingController.clear();
+                            setState(() {
+                              memberID = "";
+                            });
+
+                            _databaseController.isNew(true);
+                            // _scrollToIndex(
+                            //     _databaseController.currentUserChats.length +
+                            //         1);
+                            scrollDown();
+
+                            await Future.delayed(
+                                    const Duration(milliseconds: 2005))
+                                .then((_) => scrollDown());
                           }
                         },
                         child: Obx(
-                          () => Icon(
-                            _textBox.isEmpty
-                                ? FontAwesomeIcons.solidThumbsUp
-                                : Icons.send,
-                            size: 22.0,
-                            color: SThemeData.chatColors[_databaseController
-                                .currentUser.value.chatColor!],
-                          ),
+                          () => _textBox.isEmpty
+                              ? Icon(
+                                  FontAwesomeIcons.solidThumbsUp,
+                                  size: 22.0,
+                                  color: SThemeData.chatColors[
+                                      _databaseController
+                                          .currentUser.value.chatColor!],
+                                )
+                              : Icon(
+                                  Icons.send,
+                                  size: 22.0,
+                                  color: SThemeData.chatColors[
+                                      _databaseController
+                                          .currentUser.value.chatColor!],
+                                ),
                         ),
                       ),
                     ),
@@ -454,15 +488,57 @@ class _ChatState extends State<Chat> {
     );
   }
 
+  _hasGroup(DatabaseController _databaseController) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: IntrinsicHeight(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+              ),
+              child: Column(
+                children: [
+                  groupMembers.isEmpty
+                      ? const Text("Add Member...")
+                      : const SizedBox(),
+                  ...groupMembers.map((group) {
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: FileImage(File(group.imageUrl!)),
+                      ),
+                      title: Text(group.name!),
+                      onTap: () => setState(() {
+                        memberID = group.id!.toString();
+                        Navigator.pop(context);
+                      }),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> getImageForMessage(
       DatabaseController _databaseController) async {
     File? image = await _databaseController.pickImage();
     if (image != null) {
       if (!DateTime.now().isBlank!) {
+        if (_databaseController.currentUser.value.hasGroup!) {
+          await _hasGroup(_databaseController);
+          if (memberID.trim().isEmpty) {
+            return;
+          }
+        }
         await _databaseController.insertChat(ChatListModel(
             friendListID: _databaseController.currentUser.value.id,
             sendMessage: image.path,
-            memberID: '',
+            memberID: memberID,
             messageType: "image",
             receiveMessage: "hi",
             senderTime: DateTime.now(),
@@ -478,6 +554,9 @@ class _ChatState extends State<Chat> {
 
         _textBox.value = '';
         _textEditingController.clear();
+        setState(() {
+          memberID = "";
+        });
       }
     }
   }
@@ -495,11 +574,17 @@ class _ChatState extends State<Chat> {
                 onPressed: () async {
                   if (_timeController.text.trim().isNotEmpty) {
                     if (!DateTime.now().isBlank!) {
+                      if (_databaseController.currentUser.value.hasGroup!) {
+                        await _hasGroup(_databaseController);
+                        if (memberID.trim().isEmpty) {
+                          return;
+                        }
+                      }
                       await _databaseController.insertChat(ChatListModel(
                           friendListID:
                               _databaseController.currentUser.value.id,
                           sendMessage: _timeController.text.trim(),
-                          memberID: '',
+                          memberID: memberID,
                           messageType: "voice",
                           receiveMessage: "hi",
                           senderTime: DateTime.now(),
@@ -515,6 +600,10 @@ class _ChatState extends State<Chat> {
                       _databaseController.updateCurrentUser(userId);
 
                       _timeController.clear();
+                      setState(() {
+                        memberID = "";
+                      });
+
                       Navigator.pop(context);
                     }
                   }

@@ -37,22 +37,26 @@ class ChatAppBarAction extends StatelessWidget {
   final ThemeController _themeController = Get.find();
   final DatabaseController db = Get.find();
 
-  List<String> chatSetting = [
-    "Block",
-    "Set Profile Picture",
-    "Add Date/Time",
-    "Chat Settings",
-  ];
+  List<String> chatSetting = [];
+
+  RxString block = "Block".obs;
 
   late RxBool isBlock = false.obs;
   late int userId;
 
   @override
   Widget build(BuildContext context) {
+    chatSetting = [
+      block.value,
+      "Set Profile Picture",
+      "Add Date/Time",
+      "Chat Settings",
+    ];
     return GetBuilder<DatabaseController>(builder: (_databaseController) {
       userId = _databaseController.currentUser.value.id!;
       isBlock(_databaseController.currentUser.value.isBlock!);
       print("$isBlock");
+      isBlock.isTrue ? block("Unblock") : block("Block");
       return Container(
         height: 90.0,
         padding: const EdgeInsets.only(right: 12.0, top: 25.0),
