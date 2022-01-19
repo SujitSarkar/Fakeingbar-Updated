@@ -68,12 +68,6 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       _searchSection(),
                       _daySection(_databaseController),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () => _themeController.toggleThemeData(),
-                          child: const Text("Change Theme"),
-                        ),
-                      ),
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: _databaseController.userList.length,

@@ -58,7 +58,9 @@ class _KImagePickerState extends State<KImagePicker> {
                   child: _themeController.imageFile == null
                       ? Image.asset(
                           "images/person.png",
-                          fit: BoxFit.fill,
+                          fit: BoxFit.contain,
+                          width: customWidth(.2),
+                          height: customWidth(.2),
                         )
                       : Image.file(
                           _themeController.imageFile!,

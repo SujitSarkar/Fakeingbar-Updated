@@ -37,7 +37,19 @@ class ChatAppBarAction extends StatelessWidget {
   final ThemeController _themeController = Get.find();
   final DatabaseController db = Get.find();
 
-  List<String> chatSetting = [];
+  List<String> bChatSetting = [
+    "Block",
+    "Set Profile Picture",
+    "Add Date/Time",
+    "Chat Settings",
+  ];
+
+  List<String> chatSetting = [
+    "Unblock",
+    "Set Profile Picture",
+    "Add Date/Time",
+    "Chat Settings",
+  ];
 
   RxString block = "Block".obs;
 
@@ -46,12 +58,6 @@ class ChatAppBarAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    chatSetting = [
-      block.value,
-      "Set Profile Picture",
-      "Add Date/Time",
-      "Chat Settings",
-    ];
     return GetBuilder<DatabaseController>(builder: (_databaseController) {
       userId = _databaseController.currentUser.value.id!;
       isBlock(_databaseController.currentUser.value.isBlock!);
@@ -204,10 +210,14 @@ class ChatAppBarAction extends StatelessWidget {
                     itemBuilder: (context) {
                       return [
                         ...List.generate(
-                          chatSetting.length,
+                          bChatSetting.length,
                           (index) => PopupMenuItem(
                             value: index,
-                            child: Text(chatSetting[index]),
+                            child: Text(
+                              isBlock.isTrue
+                                  ? chatSetting[index]
+                                  : bChatSetting[index],
+                            ),
                           ),
                         )
                       ];
