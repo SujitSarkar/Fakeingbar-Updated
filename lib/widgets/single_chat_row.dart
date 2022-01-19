@@ -39,110 +39,115 @@ class _SingleChatRowState extends State<SingleChatRow> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<DatabaseController>(builder: (_databaseController) {
-      return Padding(
-        padding: EdgeInsets.only(
-          left: customWidth(.05),
-          right: customWidth(.05),
-          bottom: customWidth(0.05),
-        ),
-        child: GestureDetector(
-          onTap: () {
-            _databaseController.updateCurrentUser(widget.user.id!);
-            Get.to(() => Chat());
-          },
-          onLongPressDown: (pressDetails) {
-            setState(() {
-              _pressDetails = pressDetails;
-            });
-          },
-          onLongPress: () {
-            _showPopupMenu(_pressDetails.globalPosition, _databaseController);
-          },
-          child: Container(
-            decoration: const BoxDecoration(shape: BoxShape.circle),
-            child: Row(
-              children: <Widget>[
-                CustomeCircleAvatar(
-                  user: widget.user,
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      widget.user.name!,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: _themeController.darkenTextColor,
-                        fontWeight: FontWeight.w400,
+      return GestureDetector(
+        onTap: () {
+          _databaseController.updateCurrentUser(widget.user.id!);
+          Get.to(() => const Chat());
+        },
+        onLongPressDown: (pressDetails) {
+          setState(() {
+            _pressDetails = pressDetails;
+          });
+        },
+        onLongPress: () {
+          _showPopupMenu(_pressDetails.globalPosition, _databaseController);
+        },
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: customWidth(.05),
+            right: customWidth(.05),
+            bottom: customWidth(0.05),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                children: [
+                  CustomeCircleAvatar(
+                    user: widget.user,
+                  ),
+                  const SizedBox(
+                    width: 10.0,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        widget.user.name!,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: _themeController.darkenTextColor,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: customWidth(.02),
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          widget.user.lastMessage!,
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            color: _themeController.darkenTextColor,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(
-                          width: customWidth(.01),
-                        ),
-                        const Text(
-                          "\u00B7",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          width: customWidth(.01),
-                        ),
-                        Text(
-                          widget.user.inactiveTime!,
-                          style: const TextStyle(
-                              fontSize: 14.0, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                widget.user.messageStatus == "not send"
-                    ? Icon(
-                        Icons.circle,
-                        color: SThemeData.lightThemeColor,
-                        size: customWidth(.05),
-                      )
-                    : widget.user.messageStatus == "not received"
-                        ? Icon(
-                            Icons.check_circle_outline,
-                            color: _themeController.darkenTextColor,
-                            size: customWidth(.05),
-                          )
-                        : widget.user.messageStatus == "received"
-                            ? Icon(
-                                Icons.check_circle,
+                      SizedBox(
+                        width: customWidth(.02),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            constraints:
+                                BoxConstraints(maxWidth: customWidth(.45)),
+                            child: Text(
+                              widget.user.lastMessage!,
+                              style: TextStyle(
+                                fontSize: 14.0,
                                 color: _themeController.darkenTextColor,
-                                size: customWidth(.05),
-                              )
-                            : widget.user.messageStatus == "seen"
-                                ? SizedBox(
-                                    width: customWidth(.04),
-                                    height: customWidth(.04),
-                                    child: CustomeCircleAvatar(
-                                      user: widget.user,
-                                      onlineDotSize: 0,
-                                      showDay: false,
-                                    ),
-                                  )
-                                : const SizedBox()
-              ],
-            ),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(
+                            width: customWidth(.01),
+                          ),
+                          const Text(
+                            "\u00B7",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            width: customWidth(.01),
+                          ),
+                          Text(
+                            widget.user.inactiveTime!,
+                            style: const TextStyle(
+                                fontSize: 14.0, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              widget.user.messageStatus == "not send"
+                  ? Icon(
+                      Icons.circle,
+                      color: SThemeData.lightThemeColor,
+                      size: customWidth(.05),
+                    )
+                  : widget.user.messageStatus == "not received"
+                      ? Icon(
+                          Icons.check_circle_outline,
+                          color: _themeController.darkenTextColor,
+                          size: customWidth(.05),
+                        )
+                      : widget.user.messageStatus == "received"
+                          ? Icon(
+                              Icons.check_circle,
+                              color: _themeController.darkenTextColor,
+                              size: customWidth(.05),
+                            )
+                          : widget.user.messageStatus == "seen"
+                              ? SizedBox(
+                                  width: customWidth(.04),
+                                  height: customWidth(.04),
+                                  child: CustomeCircleAvatar(
+                                    user: widget.user,
+                                    onlineDotSize: 0,
+                                    showDay: false,
+                                  ),
+                                )
+                              : const SizedBox()
+            ],
           ),
         ),
       );

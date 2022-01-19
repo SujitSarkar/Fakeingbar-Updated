@@ -57,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  dart_emoji:
+    dependency: "direct main"
+    description:
+      name: dart_emoji
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0+1"
   device_screen_recorder:
     dependency: "direct main"
     description:
@@ -324,13 +331,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
-  scrollable_positioned_list:
-    dependency: "direct main"
-    description:
-      name: scrollable_positioned_list
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.3"
   shared_preferences:
     dependency: "direct main"
     description:

@@ -36,8 +36,8 @@ class _KImagePickerState extends State<KImagePicker> {
         child: Container(
           width: customWidth(.2),
           height: customWidth(.2),
-          padding: EdgeInsets.all(customWidth(.03)),
-          clipBehavior: Clip.hardEdge,
+          // padding: EdgeInsets.all(customWidth(.03)),
+          // clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: _themeController.chatBGColor,
             border: Border.all(
@@ -49,18 +49,30 @@ class _KImagePickerState extends State<KImagePicker> {
           child: Stack(
             alignment: AlignmentDirectional.center,
             children: [
-              _themeController.imageFile == null
-                  ? Image.asset(
-                      "images/person.png",
-                      fit: BoxFit.fill,
-                    )
-                  : Image.file(
-                      _themeController.imageFile!,
-                      fit: BoxFit.cover,
-                    ),
+              ClipRRect(
+                borderRadius:
+                    BorderRadius.all(Radius.circular(customWidth(.2))),
+                child: Container(
+                  width: customWidth(.2),
+                  height: customWidth(.2),
+                  child: _themeController.imageFile == null
+                      ? Image.asset(
+                          "images/person.png",
+                          fit: BoxFit.contain,
+                          width: customWidth(.2),
+                          height: customWidth(.2),
+                        )
+                      : Image.file(
+                          _themeController.imageFile!,
+                          width: customWidth(.4),
+                          height: customWidth(.4),
+                          fit: BoxFit.cover,
+                        ),
+                ),
+              ),
               Positioned(
-                bottom: 0,
-                right: 0,
+                bottom: customWidth(.025),
+                right: customWidth(.025),
                 child: Container(
                   decoration: BoxDecoration(
                     color: _themeController.backgroundColor,

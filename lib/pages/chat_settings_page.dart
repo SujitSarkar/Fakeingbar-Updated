@@ -82,13 +82,18 @@ class _ChatSettingsPageState extends State<ChatSettingsPage> {
                                   ? "Group Settings"
                                   : "Chat Settings",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: customWidth(.06),
-                                  color: _themeController.textColor),
+                                fontWeight: FontWeight.bold,
+                                fontSize: customWidth(.06),
+                                color: Colors.white,
+                              ),
                             ),
                             IconButton(
-                                onPressed: () => Get.back(),
-                                icon: const Icon(Icons.close)),
+                              onPressed: () => Get.back(),
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),

@@ -37,12 +37,21 @@ class ChatAppBarAction extends StatelessWidget {
   final ThemeController _themeController = Get.find();
   final DatabaseController db = Get.find();
 
-  List<String> chatSetting = [
+  List<String> bChatSetting = [
     "Block",
     "Set Profile Picture",
     "Add Date/Time",
     "Chat Settings",
   ];
+
+  List<String> chatSetting = [
+    "Unblock",
+    "Set Profile Picture",
+    "Add Date/Time",
+    "Chat Settings",
+  ];
+
+  RxString block = "Block".obs;
 
   late RxBool isBlock = false.obs;
   late int userId;
@@ -53,6 +62,7 @@ class ChatAppBarAction extends StatelessWidget {
       userId = _databaseController.currentUser.value.id!;
       isBlock(_databaseController.currentUser.value.isBlock!);
       print("$isBlock");
+      isBlock.isTrue ? block("Unblock") : block("Block");
       return Container(
         height: 90.0,
         padding: const EdgeInsets.only(right: 12.0, top: 25.0),
@@ -200,10 +210,14 @@ class ChatAppBarAction extends StatelessWidget {
                     itemBuilder: (context) {
                       return [
                         ...List.generate(
-                          chatSetting.length,
+                          bChatSetting.length,
                           (index) => PopupMenuItem(
                             value: index,
-                            child: Text(chatSetting[index]),
+                            child: Text(
+                              isBlock.isTrue
+                                  ? chatSetting[index]
+                                  : bChatSetting[index],
+                            ),
                           ),
                         )
                       ];
